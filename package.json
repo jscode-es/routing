@@ -1,0 +1,80 @@
+{
+  "name": "@jscode/react-native-routing",
+  "version": "0.1.0",
+  "description": "File-based router for React Native, without Expo or React Navigation.",
+  "license": "MIT",
+  "author": "sgonzalez@jscode.es",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-native": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./metro": {
+      "types": "./metro/withRouting.d.ts",
+      "default": "./metro/withRouting.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "metro",
+    "src"
+  ],
+  "workspaces": [
+    "example"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:watch": "tsc -p tsconfig.build.json --watch",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "npm run test:unit && npm run test:rn",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:rn": "jest",
+    "test:rn:watch": "jest --watch",
+    "example:start": "npm run start --workspace example",
+    "example:android": "npm run android --workspace example",
+    "example:ios": "npm run ios --workspace example"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-gesture-handler": ">=2.14.0",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-screens": ">=3.29.0",
+    "react-native-worklets": ">=0.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@react-native/babel-preset": "^0.86.0",
+    "@react-native/jest-preset": "^0.86.0",
+    "@react-native/metro-config": "^0.86.0",
+    "@testing-library/react-native": "^14.0.1",
+    "@types/react": "^19.2.7",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.7.0",
+    "jest": "^29.7.0",
+    "react": "^19.2.7",
+    "react-native": "^0.86.0",
+    "react-native-gesture-handler": "^3.0.2",
+    "react-native-reanimated": "^4.5.1",
+    "react-native-screens": "^4.25.2",
+    "react-native-worklets": "^0.10.2",
+    "react-test-renderer": "^19.2.7",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.63.0",
+    "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
