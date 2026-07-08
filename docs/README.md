@@ -65,6 +65,9 @@ Con esto, una app RN obtiene:
 
 ## Documentos
 
+- [roadmap.md](./roadmap.md) — plan de desarrollo TDD por fases: qué está
+  hecho, qué está en curso y checklist de lo pendiente (incluida la
+  verificación iOS diferida).
 - [file-conventions.md](./file-conventions.md) — la notación de rutas: qué
   significa cada nombre de archivo/carpeta y qué genera.
 - [architecture.md](./architecture.md) — cómo se implementará: integración
