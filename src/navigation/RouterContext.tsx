@@ -1,14 +1,20 @@
 import React, { createContext, useContext } from 'react';
 import type { ComponentType, ReactNode } from 'react';
-import type { RouteMatch, RouteNode } from '../route-tree/types';
+import type { RouteNode } from '../route-tree/types';
+import type { NavigationEntry } from './reducer';
+import type { Router } from './router';
 
 export interface RouterState {
   tree: RouteNode;
-  pathname: string;
-  match: RouteMatch | null;
+  stack: NavigationEntry[];
+  activeEntry: NavigationEntry;
 }
 
 export const RouterStateContext = createContext<RouterState | null>(null);
+
+export const RouterApiContext = createContext<Router | null>(null);
+
+export const DepthContext = createContext(0);
 
 export const SlotContext = createContext<ReactNode>(null);
 
@@ -34,7 +40,7 @@ export function RouteLevel({
 
   const isLeaf = index === chain.length - 1;
   const Component = node.component as ComponentType | undefined;
-  const content = isLeaf ? (
+  const inner = isLeaf ? (
     Component ? (
       <Component />
     ) : null
@@ -42,13 +48,15 @@ export function RouteLevel({
     <RouteLevel chain={chain} index={index + 1} />
   );
 
+  let body = inner;
   if (node.layout) {
     const Layout = node.layout as ComponentType;
-    return (
-      <SlotContext.Provider value={content}>
+    body = (
+      <SlotContext.Provider value={inner}>
         <Layout />
       </SlotContext.Provider>
     );
   }
-  return content;
+
+  return <DepthContext.Provider value={index}>{body}</DepthContext.Provider>;
 }
