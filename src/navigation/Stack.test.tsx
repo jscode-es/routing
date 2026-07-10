@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { RootRouter } from './RootRouter';
 import { Stack } from './Stack';
@@ -136,6 +136,45 @@ describe('Stack', () => {
     });
     expect(screen.getAllByTestId('screen')).toHaveLength(3);
     expect(screen.queryByText('Settings details')).toBeNull();
+  });
+
+  it('gives every screen an opaque background so push transitions do not blend', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    await fireEvent.press(screen.getByTestId('go'));
+    const contents = screen.getAllByTestId('screen-content');
+    for (const content of contents) {
+      const style = StyleSheet.flatten(content.props.style);
+      expect(style.backgroundColor).toBe('#f2f2f2');
+    }
+  });
+
+  it('keeps transparentModal screens transparent and allows contentStyle overrides', async () => {
+    const StyledLayout = () => (
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{ contentStyle: { backgroundColor: 'papayawhip' } }}
+        />
+        <Stack.Screen
+          name="users"
+          options={{ presentation: 'transparentModal' }}
+        />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './_layout.tsx': StyledLayout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    await fireEvent.press(screen.getByTestId('go'));
+    const contents = screen.getAllByTestId('screen-content');
+    expect(StyleSheet.flatten(contents[0]?.props.style).backgroundColor).toBe(
+      'papayawhip',
+    );
+    expect(
+      StyleSheet.flatten(contents[1]?.props.style).backgroundColor,
+    ).toBeUndefined();
   });
 
   it('falls back to the screen name as title without explicit options', async () => {

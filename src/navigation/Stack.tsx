@@ -23,7 +23,12 @@ import {
   StackScreen,
 } from './stack-options';
 
-const styles = StyleSheet.create({ fill: { flex: 1 } });
+const styles = StyleSheet.create({
+  fill: { flex: 1 },
+  // Fondo opaco por defecto: sin él, la pantalla entrante es transparente
+  // y durante la animación de push/pop se mezcla con la de debajo.
+  opaqueContent: { backgroundColor: '#f2f2f2' },
+});
 
 interface ScreenGroup {
   key: string;
@@ -125,7 +130,14 @@ function StackComponent({
             {/* El nativo recoloca este wrapper bajo el header; sin él, el
                 contenido se layouta a pantalla completa y el fondo queda
                 recortado. El header config nunca puede ser el primer hijo. */}
-            <ScreenContentWrapper style={StyleSheet.absoluteFill}>
+            <ScreenContentWrapper
+              style={[
+                StyleSheet.absoluteFill,
+                options.presentation !== 'transparentModal' &&
+                  styles.opaqueContent,
+                options.contentStyle,
+              ]}
+            >
               <EntryContext.Provider value={entry}>
                 <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
               </EntryContext.Provider>

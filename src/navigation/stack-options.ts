@@ -1,10 +1,12 @@
 import React from 'react';
 import type { ReactNode } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 import type { NavigationEntry } from './reducer';
 
 export interface StackScreenOptions {
   title?: string;
   presentation?: 'push' | 'modal' | 'transparentModal' | 'formSheet';
+  contentStyle?: StyleProp<ViewStyle>;
 }
 
 export interface StackScreenProps {
