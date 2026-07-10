@@ -23,6 +23,14 @@ export default tseslint.config(
     },
   },
   {
+    files: ['jest.setup.js'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
+    },
+  },
+  {
     files: ['src/route-tree/**/*.ts'],
     rules: {
       'no-restricted-imports': [
@@ -52,6 +60,10 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
     },
     settings: {
       react: {

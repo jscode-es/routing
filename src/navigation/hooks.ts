@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import type { RouteParams } from '../route-tree/types';
 import {
   DepthContext,
+  EntryContext,
   RouterApiContext,
   useRouterState,
 } from './RouterContext';
@@ -26,13 +27,15 @@ export function useGlobalSearchParams<
 
 export function useLocalSearchParams<T extends RouteParams = RouteParams>(): T {
   const { activeEntry } = useRouterState();
+  const ownEntry = useContext(EntryContext);
+  const entry = ownEntry ?? activeEntry;
   const depth = useContext(DepthContext);
-  const { chain } = activeEntry.match;
+  const { chain } = entry.match;
   const params: RouteParams = {};
   for (let i = 0; i <= depth && i < chain.length; i++) {
     const node = chain[i];
     if (node?.paramName !== undefined) {
-      const value = activeEntry.match.params[node.paramName];
+      const value = entry.match.params[node.paramName];
       if (value !== undefined) params[node.paramName] = value;
     }
   }

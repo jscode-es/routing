@@ -1,6 +1,11 @@
 export { RootRouter } from './navigation/RootRouter';
 export type { RootRouterProps } from './navigation/RootRouter';
 export { Slot } from './navigation/Slot';
+export { Stack } from './navigation/Stack';
+export type {
+  StackScreenOptions,
+  StackScreenProps,
+} from './navigation/stack-options';
 export { Link } from './navigation/Link';
 export type { LinkProps } from './navigation/Link';
 export { router } from './navigation/router';

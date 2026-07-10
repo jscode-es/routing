@@ -9,12 +9,17 @@ export default function Home() {
       <Link href="/users/42" style={styles.link}>
         Ir al usuario 42
       </Link>
+      <Link href="/modal" style={styles.link}>
+        Abrir modal
+      </Link>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     gap: 16,
   },

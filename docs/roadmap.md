@@ -95,13 +95,13 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
 - [x] `Stack.test.tsx`: un `Screen` por entrada, `activityState`
       activo/congelado, header nativo con título, `onDismissed` → POP,
       params propios por pantalla en background
-- [ ] Implementar `stack-options.ts` y `Stack.tsx` (`ScreenStack` +
+- [x] Implementar `stack-options.ts` y `Stack.tsx` (`ScreenStack` +
       `Screen` + `ScreenStackHeaderConfig`, `EntryContext` por pantalla,
       `BackHandler` de Android)
-- [ ] Tests en verde + typecheck + lint
-- [ ] `example/`: `_layout.tsx` con `<Stack>` y títulos; quitar el botón
+- [x] Tests en verde + typecheck + lint
+- [x] `example/`: `_layout.tsx` con `<Stack>` y títulos; quitar el botón
       "Volver" temporal
-- [ ] **Checklist manual Android**: transición push/pop fluida, botón
+- [x] **Checklist manual Android**: transición push/pop fluida, botón
       físico atrás (no cierra la app salvo en raíz), header nativo con
       título correcto, `presentation: 'modal'`
 - [ ] **Checklist iOS (pendiente de Mac)**: swipe-to-go-back real y su
@@ -158,8 +158,8 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
 
 | Aspecto | Cómo se verifica | Estado |
 |---|---|---|
-| Fluidez de transiciones push/pop | A mano en emulador/dispositivo | Fase 4 |
-| Botón físico "atrás" Android | A mano | Fase 4 |
+| Fluidez de transiciones push/pop | A mano en emulador/dispositivo | ✅ Fase 4 |
+| Botón físico "atrás" Android | A mano | ✅ Fase 4 |
 | Swipe-to-go-back iOS y su cancelación | A mano en iOS | Pendiente de Mac |
 | Congelado real de pantallas tapadas | Contador de renders + profiler nativo | Fase 4/5 |
 | Estado de pestañas al cambiar de tab | `TextInput` sin resetear | Fase 5 |

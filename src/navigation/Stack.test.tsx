@@ -1,0 +1,115 @@
+import React from 'react';
+import { Pressable, Text } from 'react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { RootRouter } from './RootRouter';
+import { Stack } from './Stack';
+import { router } from './router';
+import { useLocalSearchParams, useRouter } from './hooks';
+import type { RequireContext } from '../route-tree/context';
+
+function fakeContext(modules: Record<string, unknown>): RequireContext {
+  const ctx = ((key: string) => ({ default: modules[key] })) as RequireContext;
+  ctx.keys = () => Object.keys(modules);
+  return ctx;
+}
+
+const Home = () => {
+  const r = useRouter();
+  return (
+    <Pressable testID="go" onPress={() => r.push('/users/42')}>
+      <Text>Home</Text>
+    </Pressable>
+  );
+};
+
+const User = () => {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return <Text>{`User ${id}`}</Text>;
+};
+
+const Layout = () => (
+  <Stack>
+    <Stack.Screen name="index" options={{ title: 'Inicio' }} />
+    <Stack.Screen name="users" options={{ title: 'Detail' }} />
+  </Stack>
+);
+
+function makeContext() {
+  return fakeContext({
+    './_layout.tsx': Layout,
+    './index.tsx': Home,
+    './users/[id].tsx': User,
+  });
+}
+
+describe('Stack', () => {
+  it('renders one Screen per stack entry, all mounted', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    expect(screen.getAllByTestId('screen')).toHaveLength(1);
+
+    await fireEvent.press(screen.getByTestId('go'));
+    const screens = screen.getAllByTestId('screen');
+    expect(screens).toHaveLength(2);
+    expect(screen.getByText('Home')).toBeTruthy();
+    expect(screen.getByText('User 42')).toBeTruthy();
+  });
+
+  it('keeps every screen attached and freezes the ones deep in background', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    await fireEvent.press(screen.getByTestId('go'));
+    await act(async () => {
+      router.push('/users/7');
+    });
+    const screens = screen.getAllByTestId('screen');
+    // activityState nunca decrece dentro de un ScreenStack nativo.
+    expect(screens.map((s) => s.props.activityState)).toEqual([2, 2, 2]);
+    // Se congela todo salvo el top y la pantalla justo debajo (necesaria
+    // para la animación de pop / swipe-back).
+    expect(screens.map((s) => s.props.shouldFreeze)).toEqual([
+      true,
+      false,
+      false,
+    ]);
+  });
+
+  it('renders the native header config with the screen title', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    expect(screen.getByTestId('header-config').props.title).toBe('Inicio');
+
+    await fireEvent.press(screen.getByTestId('go'));
+    const headers = screen.getAllByTestId('header-config');
+    expect(headers[1]?.props.title).toBe('Detail');
+  });
+
+  it('pops the stack when a screen is dismissed natively', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    await fireEvent.press(screen.getByTestId('go'));
+    const screens = screen.getAllByTestId('screen');
+    await act(async () => {
+      screens[1]?.props.onDismissed?.({ nativeEvent: { dismissCount: 1 } });
+    });
+    expect(screen.getAllByTestId('screen')).toHaveLength(1);
+    expect(screen.getByText('Home')).toBeTruthy();
+  });
+
+  it('background screens keep their own params', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    await fireEvent.press(screen.getByTestId('go'));
+    await act(async () => {
+      router.push('/users/7');
+    });
+    expect(screen.getByText('User 42')).toBeTruthy();
+    expect(screen.getByText('User 7')).toBeTruthy();
+  });
+
+  it('falls back to the screen name as title without explicit options', async () => {
+    const PlainLayout = () => <Stack />;
+    const ctx = fakeContext({
+      './_layout.tsx': PlainLayout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    expect(screen.getByTestId('header-config').props.title).toBe('index');
+  });
+});

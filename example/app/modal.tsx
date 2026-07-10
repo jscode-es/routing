@@ -1,12 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useLocalSearchParams } from '@jscode/react-native-routing';
 
-export default function User() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+export default function Modal() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>User {id}</Text>
+      <Text style={styles.title}>Modal</Text>
+      <Text>Presentado con presentation: 'modal'</Text>
     </View>
   );
 }
@@ -16,6 +15,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 16,
   },
   title: {
     fontSize: 32,

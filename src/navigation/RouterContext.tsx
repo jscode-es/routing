@@ -14,6 +14,10 @@ export const RouterStateContext = createContext<RouterState | null>(null);
 
 export const RouterApiContext = createContext<Router | null>(null);
 
+// Entrada del stack a la que pertenece el subárbol (pantallas en background
+// conservan sus propios params aunque activeEntry haya cambiado).
+export const EntryContext = createContext<NavigationEntry | null>(null);
+
 export const DepthContext = createContext(0);
 
 export const SlotContext = createContext<ReactNode>(null);
