@@ -102,6 +102,42 @@ describe('Stack', () => {
     expect(screen.getByText('User 7')).toBeTruthy();
   });
 
+  it('scopes nested stacks to their own subtree', async () => {
+    const RootLayout = () => <Stack />;
+    const SettingsLayout = () => <Stack />;
+    const SettingsHome = () => <Text>Settings home</Text>;
+    const SettingsDetails = () => <Text>Settings details</Text>;
+    const ctx = fakeContext({
+      './_layout.tsx': RootLayout,
+      './index.tsx': Home,
+      './settings/_layout.tsx': SettingsLayout,
+      './settings/index.tsx': SettingsHome,
+      './settings/details.tsx': SettingsDetails,
+    });
+    await render(<RootRouter context={ctx} />);
+    expect(screen.getAllByTestId('screen')).toHaveLength(1);
+
+    await act(async () => {
+      router.push('/settings');
+    });
+    // Raíz: index + grupo settings; interior: settings home.
+    expect(screen.getAllByTestId('screen')).toHaveLength(3);
+
+    await act(async () => {
+      router.push('/settings/details');
+    });
+    // El push entra al stack interior sin añadir pantalla al stack raíz.
+    expect(screen.getAllByTestId('screen')).toHaveLength(4);
+    expect(screen.getByText('Settings home')).toBeTruthy();
+    expect(screen.getByText('Settings details')).toBeTruthy();
+
+    await act(async () => {
+      router.back();
+    });
+    expect(screen.getAllByTestId('screen')).toHaveLength(3);
+    expect(screen.queryByText('Settings details')).toBeNull();
+  });
+
   it('falls back to the screen name as title without explicit options', async () => {
     const PlainLayout = () => <Stack />;
     const ctx = fakeContext({

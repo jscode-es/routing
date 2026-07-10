@@ -1,0 +1,46 @@
+import React from 'react';
+import { Text } from 'react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { RootRouter } from './RootRouter';
+import { Link } from './Link';
+import type { RequireContext } from '../route-tree/context';
+
+function fakeContext(modules: Record<string, unknown>): RequireContext {
+  const ctx = ((key: string) => ({ default: modules[key] })) as RequireContext;
+  ctx.keys = () => Object.keys(modules);
+  return ctx;
+}
+
+const NotFound = () => <Text>Not found</Text>;
+const Home = () => <Link href="/nope">broken link</Link>;
+const DeepPage = () => <Text>Deep page</Text>;
+
+describe('RootRouter integration', () => {
+  it('renders +not-found for an unmatched initial path', async () => {
+    const ctx = fakeContext({
+      './index.tsx': Home,
+      './+not-found.tsx': NotFound,
+    });
+    await render(<RootRouter context={ctx} initialPath="/missing/route" />);
+    expect(screen.getByText('Not found')).toBeTruthy();
+  });
+
+  it('navigates to +not-found when a Link points to a missing route', async () => {
+    const ctx = fakeContext({
+      './index.tsx': Home,
+      './+not-found.tsx': NotFound,
+    });
+    await render(<RootRouter context={ctx} />);
+    await fireEvent.press(screen.getByText('broken link'));
+    expect(screen.getByText('Not found')).toBeTruthy();
+  });
+
+  it('passes through nested folders without a _layout', async () => {
+    const ctx = fakeContext({
+      './index.tsx': Home,
+      './deep/nested/page.tsx': DeepPage,
+    });
+    await render(<RootRouter context={ctx} initialPath="/deep/nested/page" />);
+    expect(screen.getByText('Deep page')).toBeTruthy();
+  });
+});

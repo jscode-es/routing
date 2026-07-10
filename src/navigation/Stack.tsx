@@ -7,6 +7,7 @@ import {
   ScreenStack,
   ScreenStackHeaderConfig,
 } from 'react-native-screens';
+import type { RouteNode } from '../route-tree/types';
 import {
   DepthContext,
   EntryContext,
@@ -14,6 +15,7 @@ import {
   useRouterState,
 } from './RouterContext';
 import { useRouter } from './hooks';
+import type { NavigationEntry } from './reducer';
 import {
   collectScreenConfigs,
   createBackPressHandler,
@@ -23,15 +25,57 @@ import {
 
 const styles = StyleSheet.create({ fill: { flex: 1 } });
 
+interface ScreenGroup {
+  key: string;
+  entries: NavigationEntry[];
+  child: RouteNode | undefined;
+}
+
+// Las entradas consecutivas cuyo hijo directo tiene su propio _layout
+// comparten Screen: ese subárbol monta un navegador anidado que gestiona
+// sus propias pantallas (el push entra al stack interior, no al exterior).
+function groupEntries(
+  entries: NavigationEntry[],
+  layoutDepth: number,
+): ScreenGroup[] {
+  const groups: ScreenGroup[] = [];
+  for (const entry of entries) {
+    const child = entry.match.chain[layoutDepth + 1];
+    const last = groups[groups.length - 1];
+    if (
+      last &&
+      child !== undefined &&
+      last.child === child &&
+      child.layout !== undefined
+    ) {
+      last.entries.push(entry);
+    } else {
+      groups.push({ key: entry.key, entries: [entry], child });
+    }
+  }
+  return groups;
+}
+
 function StackComponent({
   children,
 }: {
   children?: ReactNode;
 }): React.JSX.Element {
-  const { stack } = useRouterState();
+  const { tree, stack, activeEntry } = useRouterState();
   const layoutDepth = useContext(DepthContext);
+  const parentEntry = useContext(EntryContext);
   const api = useRouter();
   const configs = collectScreenConfigs(children);
+
+  // El nodo del propio layout se lee de la entrada bajo la que se renderiza
+  // este Stack (no de activeEntry: un stack anidado en background seguiría
+  // montado mientras la entrada activa vive en otro subárbol).
+  const referenceChain = (parentEntry ?? activeEntry).match.chain;
+  const ownNode = layoutDepth === 0 ? tree : referenceChain[layoutDepth];
+  const scoped = ownNode
+    ? stack.filter((entry) => entry.match.chain[layoutDepth] === ownNode)
+    : [];
+  const groups = groupEntries(scoped, layoutDepth);
 
   const stackDepthRef = useRef(stack.length);
   useEffect(() => {
@@ -52,12 +96,13 @@ function StackComponent({
 
   return (
     <ScreenStack style={styles.fill}>
-      {stack.map((entry, index) => {
+      {groups.map((group, index) => {
+        const entry = group.entries[group.entries.length - 1]!;
         const name = screenNameForEntry(entry, layoutDepth);
         const options = configs[name] ?? {};
         return (
           <Screen
-            key={entry.key}
+            key={group.key}
             // absoluteFill, no flex:1 — el nativo fija la altura real del
             // Screen (viewport menos header) vía state update, y flexGrow
             // la pisaría estirándolo de nuevo a pantalla completa.
@@ -68,10 +113,11 @@ function StackComponent({
             // la animación de pop / swipe-back tenga contenido que mostrar.
             activityState={2}
             freezeOnBlur
-            shouldFreeze={index < stack.length - 2}
+            shouldFreeze={index < groups.length - 2}
             stackPresentation={options.presentation ?? 'push'}
             onDismissed={(event) => {
-              for (let i = 0; i < event.nativeEvent.dismissCount; i++) {
+              const pops = event.nativeEvent.dismissCount * group.entries.length;
+              for (let i = 0; i < pops; i++) {
                 api.back();
               }
             }}

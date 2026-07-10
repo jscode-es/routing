@@ -16,6 +16,9 @@ export default function Home() {
       <Link href="/modal" style={styles.link}>
         Abrir modal
       </Link>
+      <Link href="/no-existe" style={styles.link}>
+        Link roto (not-found)
+      </Link>
     </View>
   );
 }

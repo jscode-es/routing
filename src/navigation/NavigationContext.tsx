@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
-import { matchPath } from '../route-tree/match';
+import { matchNotFound, matchPath } from '../route-tree/match';
 import type { RouteNode } from '../route-tree/types';
 import { createEntry, reducer } from './reducer';
 import type { NavigationState } from './reducer';
@@ -13,7 +13,7 @@ import { setActiveRouter } from './router';
 import type { Router } from './router';
 
 function initialState(tree: RouteNode, initialPath: string): NavigationState {
-  const match = matchPath(tree, initialPath);
+  const match = matchPath(tree, initialPath) ?? matchNotFound(tree);
   return { stack: match ? [createEntry(initialPath, match)] : [] };
 }
 
@@ -37,7 +37,7 @@ export function NavigationProvider({
 
   const api = useMemo<Router>(() => {
     const resolve = (href: string) => {
-      const match = matchPath(tree, href);
+      const match = matchPath(tree, href) ?? matchNotFound(tree);
       if (!match) {
         throw new Error(`No route matches "${href}"`);
       }

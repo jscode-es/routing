@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parse } from './parse';
-import { matchPath } from './match';
+import { matchNotFound, matchPath } from './match';
 
 const resolve = (key: string) => key;
 
@@ -78,5 +78,22 @@ describe('matchPath', () => {
   it('includes group nodes in the chain', () => {
     const result = matchPath(tree, '/home');
     expect(result?.chain.map((n) => n.segment)).toEqual(['', '(tabs)', 'home']);
+  });
+});
+
+describe('matchNotFound', () => {
+  it('builds a synthetic match for the root +not-found route', () => {
+    const tree = parse(['./index.tsx', './+not-found.tsx'], resolve);
+    const result = matchNotFound(tree);
+    expect(result?.node.component).toBe('./+not-found.tsx');
+    expect(result?.node.segment).toBe('+not-found');
+    expect(result?.chain).toHaveLength(2);
+    expect(result?.chain[0]).toBe(tree);
+    expect(result?.params).toEqual({});
+  });
+
+  it('returns null when the tree has no +not-found route', () => {
+    const tree = parse(['./index.tsx'], resolve);
+    expect(matchNotFound(tree)).toBeNull();
   });
 });

@@ -122,3 +122,28 @@ describe('parse', () => {
     );
   });
 });
+
+describe('deep nesting', () => {
+  it('builds three levels of folders with layouts at each level', () => {
+    const tree = parse(
+      [
+        './_layout.tsx',
+        './a/_layout.tsx',
+        './a/index.tsx',
+        './a/b/_layout.tsx',
+        './a/b/index.tsx',
+        './a/b/c.tsx',
+      ],
+      (key: string) => key,
+    );
+    expect(tree.layout).toBe('./_layout.tsx');
+    const a = tree.children.find((n) => n.segment === 'a');
+    expect(a?.layout).toBe('./a/_layout.tsx');
+    expect(a?.component).toBe('./a/index.tsx');
+    const b = a?.children.find((n) => n.segment === 'b');
+    expect(b?.layout).toBe('./a/b/_layout.tsx');
+    expect(b?.component).toBe('./a/b/index.tsx');
+    const c = b?.children.find((n) => n.segment === 'c');
+    expect(c?.component).toBe('./a/b/c.tsx');
+  });
+});

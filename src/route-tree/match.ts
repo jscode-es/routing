@@ -86,6 +86,19 @@ function matchChildren<C>(
   return null;
 }
 
+// Match sintético para app/+not-found.tsx: no existe como nodo del árbol
+// (parse lo guarda en root.notFound), así que se fabrica una hoja virtual.
+export function matchNotFound<C>(tree: RouteNode<C>): RouteMatch<C> | null {
+  if (tree.notFound === undefined) return null;
+  const node: RouteNode<C> = {
+    segment: '+not-found',
+    type: 'static',
+    component: tree.notFound,
+    children: [],
+  };
+  return { node, params: {}, chain: [tree, node] };
+}
+
 export function matchPath<C>(
   tree: RouteNode<C>,
   pathname: string,

@@ -51,12 +51,16 @@ function TabsComponent({
 }): React.JSX.Element {
   const { tree, activeEntry } = useRouterState();
   const layoutDepth = useContext(DepthContext);
+  const parentEntry = useContext(EntryContext);
   const switchTab = useContext(TabSwitchContext);
-  const { chain } = activeEntry.match;
+  // La entrada de referencia es la del subárbol propio: unas Tabs en
+  // background no deben seguir a activeEntry si vive en otro subárbol.
+  const referenceEntry = parentEntry ?? activeEntry;
+  const { chain } = referenceEntry.match;
   const layoutNode = chain[layoutDepth] ?? tree;
 
   const tabs = resolveTabs(layoutNode, children);
-  const activeName = screenNameForEntry(activeEntry, layoutDepth);
+  const activeName = screenNameForEntry(referenceEntry, layoutDepth);
   const activeIndex = Math.max(
     0,
     tabs.findIndex((tab) => tab.name === activeName),
@@ -67,8 +71,8 @@ function TabsComponent({
   // Estado derivado ajustado durante el render (patrón permitido por React).
   const [entries, setEntries] = useState<Record<string, NavigationEntry>>({});
   const pending: Record<string, NavigationEntry> = {};
-  if (entries[activeName] !== activeEntry) {
-    pending[activeName] = activeEntry;
+  if (entries[activeName] !== referenceEntry) {
+    pending[activeName] = referenceEntry;
   }
   for (const tab of tabs) {
     if (tab.name !== activeName && !entries[tab.name]) {

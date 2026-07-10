@@ -11,6 +11,7 @@ export default function RootLayout() {
         name="modal"
         options={{ title: 'Modal', presentation: 'modal' }}
       />
+      <Stack.Screen name="+not-found" options={{ title: 'No encontrado' }} />
     </Stack>
   );
 }
