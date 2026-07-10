@@ -19,26 +19,38 @@ export default function Layout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ title: 'Home' }} />
-      <Stack.Screen name="[id]" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="modal" options={{ title: 'Modal', presentation: 'modal' }} />
     </Stack>
   );
 }
 ```
 
-Si `<Stack>` no tiene `<Stack.Screen>` hijos explícitos, todas las rutas
-hermanas de la carpeta se registran automáticamente con opciones por
-defecto — `<Stack.Screen>` explícito solo hace falta para sobreescribir
-opciones por pantalla (título, transición, `presentation: 'modal'`, etc.).
+El `name` de cada pantalla es el primer segmento de ruta por debajo del
+layout (`users` para `users/[id].tsx`, `index` para el `index.tsx` de la
+propia carpeta, `(tabs)` para un grupo, `+not-found` para el fallback).
+Las rutas se registran automáticamente: `<Stack.Screen>` explícito solo
+hace falta para sobreescribir opciones por pantalla. Opciones soportadas:
+`title` (header nativo; por defecto, el `name`) y `presentation`
+(`'push' | 'modal' | 'transparentModal' | 'formSheet'`).
+
 Incluye gesto de swipe-to-go-back en iOS (nativo, vía `react-native-screens`)
 y manejo del botón físico "atrás" en Android (ver
 [architecture.md](./architecture.md#3-motor-de-navegación-propio-sobre-primitivas-nativas)).
+Un navegador anidado (por ejemplo, un sub-`<Stack>`) debe declararse en el
+`_layout.tsx` de un hijo directo del navegador padre: las entradas que
+comparten ese hijo se agrupan en una sola pantalla del stack exterior y el
+push entra al navegador interior.
 
 ### `<Tabs>` / `<Tabs.Screen>`
 
 Navegador de pestañas propio (no es `@react-navigation/bottom-tabs`),
-construido con `View`/`Pressable`/`Text` para la barra y
-`react-native-screens` para congelar nativamente las pestañas inactivas.
-Mismo comportamiento de auto-registro que `<Stack>`.
+construido con `View`/`Pressable`/`Text` para la barra (indicador animado
+con reanimated) y `react-native-screens` para congelar nativamente las
+pestañas inactivas, que conservan su estado local al cambiar de tab.
+Mismo comportamiento de auto-registro que `<Stack>`: sin `<Tabs.Screen>`
+explícitos, las rutas hermanas de la carpeta se convierten en pestañas.
+Opciones soportadas: `title` (etiqueta de la pestaña; por defecto, el
+`name`).
 
 ### `<Slot>`
 
@@ -54,8 +66,9 @@ Stack/Tabs.
 ```
 
 Renderiza un `Pressable`/`Text` (componentes core de React Native) que
-llama a `router.push(href)` al pulsarlo. Acepta las props `replace` y
-`asChild`.
+llama a `router.push(href)` al pulsarlo. Acepta las props `replace`
+(usa `router.replace` en lugar de `push`) y `style` (estilo del `Text`).
+Un `href` sin ruta coincidente navega a `+not-found` si existe.
 
 ## Hooks
 

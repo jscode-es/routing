@@ -172,15 +172,18 @@ Notas: `urlToPath` trata el "host" del esquema propio como primer segmento
 (sin historial en frío) y los eventos `url` hacen `push`; una URL sin match
 cae en `+not-found`.
 
-## Fase 8 — Pulido y empaquetado npm ⏳
+## Fase 8 — Pulido y empaquetado npm ✅ (release 1.0 pendiente de iOS)
 
-- [ ] `npm run build` → `dist/` (CJS + `.d.ts`) correcto
-- [ ] Script de humo: `npm pack` + instalar el tarball en un directorio
-      aparte y hacer `require()` de los entry points
-- [ ] `package.json` final (`exports`, `files`, `sideEffects`)
-- [ ] Actualizar docs con los valores reales fijados durante el desarrollo
-- [ ] LICENSE + README raíz del paquete
-- [ ] Regresión final en Android contra el tarball empaquetado
+- [x] `npm run build` → `dist/` (CJS + `.d.ts`) correcto
+- [x] Script de humo: `npm pack` + instalar el tarball en un directorio
+      aparte y hacer `require()` de los entry points (`npm run smoke`)
+- [x] `package.json` final (`exports`, `files`, `sideEffects: false`)
+- [x] Actualizar docs con los valores reales fijados durante el desarrollo
+      (nombres de pantalla, opciones de `Stack.Screen`/`Tabs.Screen`,
+      `Link` sin `asChild`, navegadores anidados)
+- [x] LICENSE + README raíz del paquete
+- [x] Regresión final en Android contra el tarball empaquetado (example
+      apuntando al `.tgz`: home, push, back y deep link verificados)
 - [ ] **Antes del release 1.0**: completar todos los checklist iOS en un Mac
       (`pod install`, swipe back, modales, deep links)
 

@@ -24,6 +24,7 @@
     "metro",
     "src"
   ],
+  "sideEffects": false,
   "workspaces": [
     "example"
   ],
@@ -39,6 +40,7 @@
     "test:unit:watch": "vitest",
     "test:rn": "jest",
     "test:rn:watch": "jest --watch",
+    "smoke": "node scripts/smoke-pack.mjs",
     "example:start": "npm run start --workspace example",
     "example:android": "npm run android --workspace example",
     "example:ios": "npm run ios --workspace example"

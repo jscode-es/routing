@@ -23,6 +23,15 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/*.mjs'],
+    languageOptions: {
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     files: ['jest.setup.js'],
     languageOptions: {
       globals: {
