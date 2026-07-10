@@ -148,10 +148,13 @@ son azúcar sintáctico sobre `dispatch` de este reducer, resuelto contra el
 - El botón físico de "atrás" en Android se captura con
   `BackHandler.addEventListener('hardwareBackPress', …)` (core de RN) para
   hacer `router.back()`.
-- Áreas seguras (notch, barra de estado) se resuelven con el componente
-  `SafeAreaView` que ya trae `react-native` — no se añade
-  `react-native-safe-area-context` porque no es una pieza de rendimiento
-  crítico, solo cálculo de insets.
+- Áreas seguras (notch, gesture bar, home indicator) se resuelven con el
+  `SafeAreaView` que trae `react-native-screens` (subpath `/experimental`,
+  adaptado de `react-native-safe-area-context`) — no se añade
+  `react-native-safe-area-context` como dependencia extra porque la misma
+  primitiva ya viene con screens (por eso el peer exige `>=4.25`). El
+  `SafeAreaView` del core de RN no sirve: es iOS-only y no cubre la
+  gesture bar de Android edge-to-edge.
 
 ### 3.3 `<Tabs>`: barra de pestañas
 
@@ -201,7 +204,7 @@ proyecto de la app (esto no lo puede resolver un paquete de JS).
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-screens": ">=3.29.0",
+    "react-native-screens": ">=4.25.0",
     "react-native-gesture-handler": ">=2.14.0",
     "react-native-reanimated": ">=4.0.0",
     "react-native-worklets": ">=0.5.0"

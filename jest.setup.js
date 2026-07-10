@@ -31,6 +31,15 @@ jest.mock('react-native-screens', () => {
 
 // El mock oficial de reanimated importa react-native-worklets, que necesita
 // el módulo nativo: mock manual mínimo con la API que usa el paquete.
+jest.mock('react-native-screens/experimental', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    SafeAreaView: ({ children, ...props }) =>
+      React.createElement(View, { testID: 'safe-area', ...props }, children),
+  };
+});
+
 jest.mock('react-native-reanimated', () => {
   const { View } = require('react-native');
   return {

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Screen, ScreenContainer } from 'react-native-screens';
+import { SafeAreaView } from 'react-native-screens/experimental';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -23,10 +24,15 @@ import { hrefForTab, resolveTabs, TabsScreen } from './tabs-options';
 const styles = StyleSheet.create({
   root: { flex: 1 },
   container: { flex: 1 },
-  bar: {
-    flexDirection: 'row',
+  // El SafeAreaView de screens aplica flex:1 por defecto; la barra debe
+  // medir solo su contenido + inset inferior (gesture bar / home indicator).
+  barSafeArea: {
+    flex: 0,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#c7c7c7',
+  },
+  bar: {
+    flexDirection: 'row',
   },
   item: {
     flex: 1,
@@ -119,29 +125,34 @@ function TabsComponent({
           );
         })}
       </ScreenContainer>
-      <View
-        style={styles.bar}
-        onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
-      >
-        <Animated.View testID="tab-indicator" style={[styles.indicator, indicatorStyle]} />
-        {tabs.map((tab) => {
-          const active = tab.name === activeName;
-          return (
-            <Pressable
-              key={tab.name}
-              testID={`tab-${tab.name}`}
-              style={styles.item}
-              onPress={() =>
-                switchTab?.(hrefForTab(chain, layoutDepth, tab.name))
-              }
-            >
-              <Text style={active ? styles.labelActive : styles.label}>
-                {tab.options.title ?? tab.name}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      <SafeAreaView edges={{ bottom: true }} style={styles.barSafeArea}>
+        <View
+          style={styles.bar}
+          onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
+        >
+          <Animated.View
+            testID="tab-indicator"
+            style={[styles.indicator, indicatorStyle]}
+          />
+          {tabs.map((tab) => {
+            const active = tab.name === activeName;
+            return (
+              <Pressable
+                key={tab.name}
+                testID={`tab-${tab.name}`}
+                style={styles.item}
+                onPress={() =>
+                  switchTab?.(hrefForTab(chain, layoutDepth, tab.name))
+                }
+              >
+                <Text style={active ? styles.labelActive : styles.label}>
+                  {tab.options.title ?? tab.name}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </SafeAreaView>
     </View>
   );
 }

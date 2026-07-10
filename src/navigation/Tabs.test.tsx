@@ -86,6 +86,13 @@ describe('Tabs', () => {
     expect(screen.getByTestId('tab-indicator')).toBeTruthy();
   });
 
+  it('wraps the tab bar in a bottom safe area', async () => {
+    await render(<RootRouter context={makeContext()} initialPath="/home" />);
+    const safeArea = screen.getByTestId('safe-area');
+    expect(safeArea.props.edges).toEqual({ bottom: true });
+    expect(screen.getByTestId('tab-home')).toBeTruthy();
+  });
+
   it('keeps tab state when nested inside a root Stack', async () => {
     const RootStackLayout = () => <Stack />;
     const ctx = fakeContext({
