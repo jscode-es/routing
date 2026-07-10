@@ -30,11 +30,21 @@ layout (`users` para `users/[id].tsx`, `index` para el `index.tsx` de la
 propia carpeta, `(tabs)` para un grupo, `not-found` para el fallback).
 Las rutas se registran automáticamente: `<Stack.Screen>` explícito solo
 hace falta para sobreescribir opciones por pantalla. Opciones soportadas:
-`title` (header nativo; por defecto, el `name`), `presentation`
-(`'push' | 'modal' | 'transparentModal' | 'formSheet'`) y `contentStyle`
-(estilo del contenedor de la pantalla; por defecto lleva un fondo opaco
-`#f2f2f2` para que las transiciones push/pop no se mezclen con la pantalla
-inferior — `transparentModal` no lo aplica).
+
+| Opción | Descripción |
+| --- | --- |
+| `title` | Título del header nativo (por defecto, el `name`). |
+| `headerShown` | `false` oculta el header nativo (por defecto `true`). |
+| `safeArea` | Solo con `headerShown: false`: `true` (default) aplica el inset superior; `false` deja el contenido a sangre bajo la barra de estado (full-bleed, estilo OTT). Con header visible el inset lo gestiona el propio header. |
+| `presentation` | `'push' \| 'modal' \| 'transparentModal' \| 'formSheet'`. |
+| `contentStyle` | Estilo del contenedor de la pantalla; por defecto lleva un fondo opaco `#f2f2f2` para que las transiciones push/pop no se mezclen con la pantalla inferior (`transparentModal` no lo aplica). |
+
+```tsx
+<Stack.Screen
+  name="player"
+  options={{ headerShown: false, safeArea: false, contentStyle: { backgroundColor: '#000' } }}
+/>
+```
 
 Incluye gesto de swipe-to-go-back en iOS (nativo, vía `react-native-screens`)
 y manejo del botón físico "atrás" en Android (ver

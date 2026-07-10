@@ -7,6 +7,7 @@ import {
   ScreenStack,
   ScreenStackHeaderConfig,
 } from 'react-native-screens';
+import { SafeAreaView } from 'react-native-screens/experimental';
 import type { RouteNode } from '../route-tree/types';
 import {
   DepthContext,
@@ -105,6 +106,12 @@ function StackComponent({
         const entry = group.entries[group.entries.length - 1]!;
         const name = screenNameForEntry(entry, layoutDepth);
         const options = configs[name] ?? {};
+        const headerShown = options.headerShown !== false;
+        const content = (
+          <EntryContext.Provider value={entry}>
+            <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
+          </EntryContext.Provider>
+        );
         return (
           <Screen
             key={group.key}
@@ -138,11 +145,18 @@ function StackComponent({
                 options.contentStyle,
               ]}
             >
-              <EntryContext.Provider value={entry}>
-                <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
-              </EntryContext.Provider>
+              {!headerShown && options.safeArea !== false ? (
+                <SafeAreaView edges={{ top: true }} style={styles.fill}>
+                  {content}
+                </SafeAreaView>
+              ) : (
+                content
+              )}
             </ScreenContentWrapper>
-            <ScreenStackHeaderConfig title={options.title ?? name} />
+            <ScreenStackHeaderConfig
+              title={options.title ?? name}
+              hidden={headerShown ? undefined : true}
+            />
           </Screen>
         );
       })}

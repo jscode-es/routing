@@ -7,6 +7,11 @@ export interface StackScreenOptions {
   title?: string;
   presentation?: 'push' | 'modal' | 'transparentModal' | 'formSheet';
   contentStyle?: StyleProp<ViewStyle>;
+  headerShown?: boolean;
+  // Solo aplica con headerShown: false (con header, el inset superior lo
+  // gestiona el propio header nativo). false = contenido a sangre bajo la
+  // barra de estado (full-bleed, estilo OTT).
+  safeArea?: boolean;
 }
 
 export interface StackScreenProps {

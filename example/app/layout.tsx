@@ -9,7 +9,13 @@ export default function RootLayout() {
       <Stack.Screen name="users" options={{ title: 'Usuario' }} />
       <Stack.Screen
         name="modal"
-        options={{ title: 'Modal', presentation: 'modal' }}
+        options={{
+          title: 'Modal',
+          presentation: 'modal',
+          headerShown: false,
+          safeArea: false,
+          contentStyle: { backgroundColor: '#111' },
+        }}
       />
       <Stack.Screen name="not-found" options={{ title: 'No encontrado' }} />
     </Stack>

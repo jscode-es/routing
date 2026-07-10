@@ -177,6 +177,62 @@ describe('Stack', () => {
     ).toBeUndefined();
   });
 
+  it('hides the native header with headerShown: false', async () => {
+    const Layout = () => (
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': Layout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    expect(screen.getByTestId('header-config').props.hidden).toBe(true);
+  });
+
+  it('applies a top safe area by default when the header is hidden', async () => {
+    const Layout = () => (
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': Layout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    expect(screen.getByTestId('safe-area').props.edges).toEqual({ top: true });
+    expect(screen.getByText('Home')).toBeTruthy();
+  });
+
+  it('goes full-bleed with safeArea: false (OTT style)', async () => {
+    const Layout = () => (
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{ headerShown: false, safeArea: false }}
+        />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': Layout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    expect(screen.queryByTestId('safe-area')).toBeNull();
+    expect(screen.getByText('Home')).toBeTruthy();
+  });
+
+  it('does not add a top safe area when the native header is shown', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    expect(screen.getByTestId('header-config').props.hidden).toBeUndefined();
+    expect(screen.queryByTestId('safe-area')).toBeNull();
+  });
+
   it('falls back to the screen name as title without explicit options', async () => {
     const PlainLayout = () => <Stack />;
     const ctx = fakeContext({
