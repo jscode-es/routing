@@ -13,6 +13,7 @@ import {
   DepthContext,
   EntryContext,
   EntrySubtree,
+  TopInsetHandledContext,
   useRouterState,
 } from './RouterContext';
 import { useRouter } from './hooks';
@@ -70,6 +71,7 @@ function StackComponent({
   const { tree, stack, activeEntry } = useRouterState();
   const layoutDepth = useContext(DepthContext);
   const parentEntry = useContext(EntryContext);
+  const topInsetHandled = useContext(TopInsetHandledContext);
   const api = useRouter();
   const configs = collectScreenConfigs(children);
 
@@ -107,6 +109,8 @@ function StackComponent({
         const name = screenNameForEntry(entry, layoutDepth);
         const options = configs[name] ?? {};
         const headerShown = options.headerShown !== false;
+        const wantsSafeArea =
+          !headerShown && options.safeArea !== false && !topInsetHandled;
         const content = (
           <EntryContext.Provider value={entry}>
             <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
@@ -145,17 +149,24 @@ function StackComponent({
                 options.contentStyle,
               ]}
             >
-              {!headerShown && options.safeArea !== false ? (
-                <SafeAreaView edges={{ top: true }} style={styles.fill}>
-                  {content}
-                </SafeAreaView>
-              ) : (
-                content
-              )}
+              <TopInsetHandledContext.Provider
+                value={topInsetHandled || headerShown || wantsSafeArea}
+              >
+                {wantsSafeArea ? (
+                  <SafeAreaView edges={{ top: true }} style={styles.fill}>
+                    {content}
+                  </SafeAreaView>
+                ) : (
+                  content
+                )}
+              </TopInsetHandledContext.Provider>
             </ScreenContentWrapper>
             <ScreenStackHeaderConfig
               title={options.title ?? name}
               hidden={headerShown ? undefined : true}
+              // Un ancestro ya aplicó el inset superior: este header no
+              // debe volver a sumar el alto de la barra de estado.
+              disableTopInsetApplication={topInsetHandled ? true : undefined}
             />
           </Screen>
         );

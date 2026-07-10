@@ -233,6 +233,46 @@ describe('Stack', () => {
     expect(screen.queryByTestId('safe-area')).toBeNull();
   });
 
+  it('nested headers do not re-apply the top inset already handled by a safe area', async () => {
+    const RootLayout = () => (
+      <Stack>
+        <Stack.Screen name="sec" options={{ headerShown: false }} />
+      </Stack>
+    );
+    const SecLayout = () => <Stack />;
+    const ctx = fakeContext({
+      './layout.tsx': RootLayout,
+      './sec/layout.tsx': SecLayout,
+      './sec/index.tsx': Home,
+    });
+    await render(<RootRouter context={ctx} initialPath="/sec" />);
+    const headers = screen.getAllByTestId('header-config');
+    const inner = headers.find((h) => h.props.hidden === undefined);
+    expect(inner?.props.disableTopInsetApplication).toBe(true);
+    // El inset lo aplica una única safe area (la del screen exterior).
+    expect(screen.getAllByTestId('safe-area')).toHaveLength(1);
+  });
+
+  it('nested hidden-header screens do not stack a second safe area', async () => {
+    const RootLayout = () => (
+      <Stack>
+        <Stack.Screen name="sec" options={{ headerShown: false }} />
+      </Stack>
+    );
+    const SecLayout = () => (
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': RootLayout,
+      './sec/layout.tsx': SecLayout,
+      './sec/index.tsx': Home,
+    });
+    await render(<RootRouter context={ctx} initialPath="/sec" />);
+    expect(screen.getAllByTestId('safe-area')).toHaveLength(1);
+  });
+
   it('falls back to the screen name as title without explicit options', async () => {
     const PlainLayout = () => <Stack />;
     const ctx = fakeContext({

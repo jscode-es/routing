@@ -23,6 +23,11 @@ export const TabSwitchContext = createContext<((href: string) => void) | null>(
   null,
 );
 
+// Interno: un ancestro (header nativo visible o SafeAreaView de pantalla
+// sin header) ya gestiona el inset superior — los navegadores anidados no
+// deben volver a aplicarlo (evita el doble hueco bajo la barra de estado).
+export const TopInsetHandledContext = createContext(false);
+
 export const DepthContext = createContext(0);
 
 export const SlotContext = createContext<ReactNode>(null);
