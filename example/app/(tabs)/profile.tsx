@@ -1,16 +1,20 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Link, usePathname } from '@jscode/react-native-routing';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Redirect, usePathname } from '@jscode/react-native-routing';
+import { setSession, useSession } from '../../auth';
 
 export default function Profile() {
+  const session = useSession();
   const pathname = usePathname();
+  if (!session) return <Redirect href="/login" />;
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
       <Text>pathname: {pathname}</Text>
-      <Link href="/login" style={styles.link}>
-        Ir a login
-      </Link>
+      <Text>Sesión iniciada</Text>
+      <Pressable style={styles.button} onPress={() => setSession(false)}>
+        <Text style={styles.buttonText}>Cerrar sesión</Text>
+      </Pressable>
     </View>
   );
 }
@@ -26,8 +30,14 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
   },
-  link: {
-    fontSize: 18,
-    color: '#0a7ea4',
+  button: {
+    backgroundColor: '#c0392b',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });

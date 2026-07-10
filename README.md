@@ -27,7 +27,8 @@ app/
   indicador animado con reanimated.
 - Navegadores anidados (sub-stacks) independientes del stack raíz.
 - `useRouter`, `useLocalSearchParams`, `useGlobalSearchParams`,
-  `usePathname`, `useSegments`, `<Link>`, `<Slot>` y router imperativo.
+  `usePathname`, `useSegments`, `<Link>`, `<Slot>`, `<Redirect>` (guards
+  de auth declarativos) y router imperativo.
 - Deep linking con el módulo `Linking` del core (frío y caliente), sin
   configuración de linking aparte: se deriva del árbol de rutas.
 - Nueva Arquitectura (Fabric) y Fast Refresh: los archivos nuevos bajo

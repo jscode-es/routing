@@ -84,6 +84,26 @@ llama a `router.push(href)` al pulsarlo. Acepta las props `replace`
 Un `href` sin ruta coincidente navega a `app/not-found.tsx` (o a la
 pantalla 404 por defecto del paquete si la app no lo define).
 
+### `<Redirect>`
+
+Guard declarativo para contenido protegido: renderízalo en lugar del
+contenido y hace `router.replace(href)` al montarse (sin apilar
+historial). El patrón para rutas con auth es comprobar la sesión en el
+`layout.tsx` (o en la pantalla) y devolver el redirect:
+
+```tsx
+// app/(tabs)/layout.tsx
+export default function TabsLayout() {
+  const session = useSession(); // tu estado de auth
+  if (!session) return <Redirect href="/login" />;
+  return <Tabs>...</Tabs>;
+}
+```
+
+Como el guard es una condición de render, reacciona solo a los cambios de
+sesión: al hacer logout, la pantalla protegida expulsa al usuario a
+`/login` automáticamente.
+
 ## Hooks
 
 ### `useRouter()`

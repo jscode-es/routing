@@ -8,7 +8,10 @@ export default function RootLayout() {
         name="(tabs)"
         options={{ title: 'Routing Example', headerShown: false }}
       />
-      <Stack.Screen name="(auth)" options={{ title: 'Login' }} />
+      <Stack.Screen
+        name="(auth)"
+        options={{ title: 'Login', headerShown: false }}
+      />
       <Stack.Screen name="users" options={{ title: 'Usuario' }} />
       <Stack.Screen
         name="modal"

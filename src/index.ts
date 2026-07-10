@@ -13,6 +13,8 @@ export type {
 } from './navigation/tabs-options';
 export { Link } from './navigation/Link';
 export type { LinkProps } from './navigation/Link';
+export { Redirect } from './navigation/Redirect';
+export type { RedirectProps } from './navigation/Redirect';
 export { router } from './navigation/router';
 export type { Router } from './navigation/router';
 export {

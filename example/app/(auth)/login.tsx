@@ -1,14 +1,20 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from '@jscode/react-native-routing';
+import { setSession } from '../../auth';
 
 export default function Login() {
   const router = useRouter();
+  const login = () => {
+    setSession(true);
+    router.replace('/profile');
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
+      <Text>El perfil requiere sesión</Text>
       <TextInput style={styles.input} placeholder="Email" />
-      <Pressable style={styles.button} onPress={() => router.back()}>
+      <Pressable style={styles.button} onPress={login}>
         <Text style={styles.buttonText}>Entrar</Text>
       </Pressable>
     </View>
