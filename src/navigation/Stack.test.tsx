@@ -299,6 +299,32 @@ describe('Stack', () => {
     ).toBeUndefined();
   });
 
+  it('maps the orientation option to the native screenOrientation prop', async () => {
+    const Layout = () => (
+      <Stack>
+        <Stack.Screen name="index" options={{ orientation: 'portrait' }} />
+        <Stack.Screen name="users" options={{ orientation: 'landscape' }} />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': Layout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    await fireEvent.press(screen.getByTestId('go'));
+    const screens = screen.getAllByTestId('screen');
+    expect(screens[0]?.props.screenOrientation).toBe('portrait');
+    expect(screens[1]?.props.screenOrientation).toBe('landscape');
+  });
+
+  it('leaves the system orientation without the option', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    expect(
+      screen.getAllByTestId('screen')[0]?.props.screenOrientation,
+    ).toBeUndefined();
+  });
+
   it('falls back to the screen name as title without explicit options', async () => {
     const PlainLayout = () => <Stack />;
     const ctx = fakeContext({

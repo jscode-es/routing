@@ -3,6 +3,8 @@ export type { RootRouterProps } from './navigation/RootRouter';
 export { Slot } from './navigation/Slot';
 export { Stack } from './navigation/Stack';
 export type {
+  ScreenOrientation,
+  StackAnimation,
   StackScreenOptions,
   StackScreenProps,
 } from './navigation/stack-options';

@@ -20,6 +20,7 @@ export default function RootLayout() {
           presentation: 'modal',
           headerShown: false,
           safeArea: false,
+          orientation: 'landscape',
           contentStyle: { backgroundColor: '#111' },
         }}
       />

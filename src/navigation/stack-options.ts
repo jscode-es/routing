@@ -3,6 +3,16 @@ import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import type { NavigationEntry } from './reducer';
 
+export type ScreenOrientation =
+  | 'default'
+  | 'all'
+  | 'portrait'
+  | 'portrait_up'
+  | 'portrait_down'
+  | 'landscape'
+  | 'landscape_left'
+  | 'landscape_right';
+
 export type StackAnimation =
   | 'default'
   | 'fade'
@@ -18,6 +28,7 @@ export interface StackScreenOptions {
   title?: string;
   presentation?: 'push' | 'modal' | 'transparentModal' | 'formSheet';
   animation?: StackAnimation;
+  orientation?: ScreenOrientation;
   contentStyle?: StyleProp<ViewStyle>;
   headerShown?: boolean;
   // Solo aplica con headerShown: false (con header, el inset superior lo
