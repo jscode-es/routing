@@ -36,7 +36,7 @@ const Layout = () => (
 
 function makeContext() {
   return fakeContext({
-    './_layout.tsx': Layout,
+    './layout.tsx': Layout,
     './index.tsx': Home,
     './users/[id].tsx': User,
   });
@@ -108,9 +108,9 @@ describe('Stack', () => {
     const SettingsHome = () => <Text>Settings home</Text>;
     const SettingsDetails = () => <Text>Settings details</Text>;
     const ctx = fakeContext({
-      './_layout.tsx': RootLayout,
+      './layout.tsx': RootLayout,
       './index.tsx': Home,
-      './settings/_layout.tsx': SettingsLayout,
+      './settings/layout.tsx': SettingsLayout,
       './settings/index.tsx': SettingsHome,
       './settings/details.tsx': SettingsDetails,
     });
@@ -162,7 +162,7 @@ describe('Stack', () => {
       </Stack>
     );
     const ctx = fakeContext({
-      './_layout.tsx': StyledLayout,
+      './layout.tsx': StyledLayout,
       './index.tsx': Home,
       './users/[id].tsx': User,
     });
@@ -180,7 +180,7 @@ describe('Stack', () => {
   it('falls back to the screen name as title without explicit options', async () => {
     const PlainLayout = () => <Stack />;
     const ctx = fakeContext({
-      './_layout.tsx': PlainLayout,
+      './layout.tsx': PlainLayout,
       './index.tsx': Home,
       './users/[id].tsx': User,
     });

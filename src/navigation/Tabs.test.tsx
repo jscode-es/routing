@@ -32,7 +32,7 @@ const TabsLayout = () => (
 
 function makeContext(layout: unknown = TabsLayout) {
   return fakeContext({
-    './(tabs)/_layout.tsx': layout,
+    './(tabs)/layout.tsx': layout,
     './(tabs)/home.tsx': Home,
     './(tabs)/profile.tsx': Profile,
   });
@@ -96,8 +96,8 @@ describe('Tabs', () => {
   it('keeps tab state when nested inside a root Stack', async () => {
     const RootStackLayout = () => <Stack />;
     const ctx = fakeContext({
-      './_layout.tsx': RootStackLayout,
-      './(tabs)/_layout.tsx': TabsLayout,
+      './layout.tsx': RootStackLayout,
+      './(tabs)/layout.tsx': TabsLayout,
       './(tabs)/home.tsx': Home,
       './(tabs)/profile.tsx': Profile,
     });

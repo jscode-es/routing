@@ -31,7 +31,7 @@ describe('RootRouter + Slot', () => {
     expect(screen.queryByText('Home')).toBeNull();
   });
 
-  it('renders a root _layout around the matched child via Slot', async () => {
+  it('renders a root layout around the matched child via Slot', async () => {
     const Layout = () => (
       <View testID="layout">
         <Text>Shell</Text>
@@ -39,7 +39,7 @@ describe('RootRouter + Slot', () => {
       </View>
     );
     const ctx = fakeContext({
-      './_layout.tsx': Layout,
+      './layout.tsx': Layout,
       './index.tsx': Home,
     });
     await render(<RootRouter context={ctx} />);
@@ -62,8 +62,8 @@ describe('RootRouter + Slot', () => {
       </View>
     );
     const ctx = fakeContext({
-      './_layout.tsx': RootLayout,
-      './(tabs)/_layout.tsx': TabsLayout,
+      './layout.tsx': RootLayout,
+      './(tabs)/layout.tsx': TabsLayout,
       './(tabs)/home.tsx': Home,
     });
     await render(<RootRouter context={ctx} initialPath="/home" />);

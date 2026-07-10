@@ -36,7 +36,7 @@ interface ScreenGroup {
   child: RouteNode | undefined;
 }
 
-// Las entradas consecutivas cuyo hijo directo tiene su propio _layout
+// Las entradas consecutivas cuyo hijo directo tiene su propio layout
 // comparten Screen: ese subárbol monta un navegador anidado que gestiona
 // sus propias pantallas (el push entra al stack interior, no al exterior).
 function groupEntries(

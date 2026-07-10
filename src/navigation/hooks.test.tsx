@@ -145,7 +145,7 @@ describe('introspection hooks', () => {
       );
     };
     const ctx = fakeContext({
-      './_layout.tsx': Layout,
+      './layout.tsx': Layout,
       './users/[id].tsx': User,
     });
     await render(<RootRouter context={ctx} initialPath="/users/42" />);

@@ -53,7 +53,7 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
 ## Fase 1 — Motor de rutas puro: parser + matcher ✅
 
 - [x] `parse.test.ts` + `parse.ts`: estáticas, `index`, `[id]`,
-      `[...slug]`, grupos `(group)`, `_layout`, `not-found`, error por
+      `[...slug]`, grupos `(group)`, `layout`, `not-found`, error por
       conflicto `foo.tsx` + `foo/index.tsx`
 - [x] `match.test.ts` + `match.ts`: extracción de params, prioridad
       estático > dinámico, catch-all multi-segmento, grupos transparentes,
@@ -99,7 +99,7 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
       `Screen` + `ScreenStackHeaderConfig`, `EntryContext` por pantalla,
       `BackHandler` de Android)
 - [x] Tests en verde + typecheck + lint
-- [x] `example/`: `_layout.tsx` con `<Stack>` y títulos; quitar el botón
+- [x] `example/`: `layout.tsx` con `<Stack>` y títulos; quitar el botón
       "Volver" temporal
 - [x] **Checklist manual Android**: transición push/pop fluida, botón
       físico atrás (no cierra la app salvo en raíz), header nativo con
@@ -115,7 +115,7 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
       contenido de cada pestaña en `Screen` (congelado nativo), indicador
       animado con reanimated
 - [x] `example/`: reestructurar con `(auth)/login.tsx` y
-      `(tabs)/_layout.tsx` (Home/Profile)
+      `(tabs)/layout.tsx` (Home/Profile)
 - [x] **Checklist manual Android**: cambiar de tab conserva el estado
       (un `TextInput` no se resetea), indicador fluido
 - [ ] **Checklist iOS (pendiente de Mac)**
@@ -138,9 +138,9 @@ Notas técnicas que quedaron resueltas aquí:
 ## Fase 6 — Layouts anidados, grupos, not-found ✅
 
 - [x] TDD: integración en `RootRouter.test.tsx` (path inexistente →
-      `not-found`, pass-through implícito sin `_layout`), `parse.test.ts`
+      `not-found`, pass-through implícito sin `layout`), `parse.test.ts`
       con 3 niveles de anidamiento
-- [x] `example/`: mini-`<Stack>` dentro de `(tabs)/settings/_layout.tsx`,
+- [x] `example/`: mini-`<Stack>` dentro de `(tabs)/settings/layout.tsx`,
       `app/not-found.tsx`, un `<Link>` roto visible
 - [x] **Checklist manual Android**: link roto → not-found; sub-stack de
       settings independiente del stack raíz
@@ -154,10 +154,10 @@ Notas técnicas que quedaron resueltas aquí:
   La convención fue `+not-found.tsx` hasta que se renombró a
   `not-found.tsx` (nombre reservado, sin `+`).
 - `Stack` acota sus entradas al subárbol de su layout (vía `EntryContext`)
-  y agrupa las entradas consecutivas cuyo hijo directo tiene `_layout`
+  y agrupa las entradas consecutivas cuyo hijo directo tiene `layout`
   propio en una sola `Screen`: el push entra al navegador anidado sin
   apilar en el exterior. Limitación deliberada: un navegador anidado debe
-  colgar de un hijo directo con `_layout`.
+  colgar de un hijo directo con `layout`.
 
 ## Fase 7 — Deep linking ✅ (iOS pendiente)
 

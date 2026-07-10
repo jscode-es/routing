@@ -66,24 +66,24 @@ app/
     login.tsx        →  /login
     register.tsx     →  /register
   (tabs)/
-    _layout.tsx       →  define el tab navigator inferior
+    layout.tsx       →  define el tab navigator inferior
     home.tsx          →  /home
     profile.tsx       →  /profile
 ```
 
 Tanto `(auth)` como `(tabs)` son invisibles en la ruta resultante; solo
-existen para delimitar el alcance de un `_layout.tsx`.
+existen para delimitar el alcance de un `layout.tsx`.
 
-## Layouts (`_layout.tsx`)
+## Layouts (`layout.tsx`)
 
-Un archivo `_layout.tsx` define el navegador (Stack, Tabs, Drawer, …) para
+Un archivo `layout.tsx` define el navegador (Stack, Tabs, Drawer, …) para
 todas las rutas hermanas y anidadas de esa carpeta — el mismo rol que el
-`_layout.tsx` de Expo Router y análogo al `layout.tsx` de Next.js. Exporta un
-componente por defecto que renderiza una de las primitivas de navegador del
-paquete:
+`_layout.tsx` de Expo Router (aquí sin el guion bajo) y que el
+`layout.tsx` de Next.js. Exporta un componente por defecto que renderiza
+una de las primitivas de navegador del paquete:
 
 ```tsx
-// app/(tabs)/_layout.tsx
+// app/(tabs)/layout.tsx
 import { Tabs } from '@jscode/react-native-routing';
 
 export default function TabsLayout() {
@@ -96,9 +96,9 @@ export default function TabsLayout() {
 }
 ```
 
-Los layouts se anidan: un `_layout.tsx` en `app/` envuelve toda la app (por
-ejemplo, un Stack raíz), y un `_layout.tsx` dentro de `app/(tabs)/` envuelve
-solo ese grupo. Si una carpeta no tiene `_layout.tsx`, las rutas se
+Los layouts se anidan: un `layout.tsx` en `app/` envuelve toda la app (por
+ejemplo, un Stack raíz), y un `layout.tsx` dentro de `app/(tabs)/` envuelve
+solo ese grupo. Si una carpeta no tiene `layout.tsx`, las rutas se
 renderizan directamente bajo el layout padre más cercano (paso directo
 implícito, el mismo comportamiento por defecto que el `<Slot>` de Expo
 Router).
@@ -115,12 +115,11 @@ hace falta añadir nada.
 
 | Nombre            | Propósito                                    |
 | ------------------- | ---------------------------------------------- |
-| `_layout.tsx`        | Navegador/layout de la carpeta                |
+| `layout.tsx`        | Navegador/layout de la carpeta                |
 | `not-found.tsx`      | Fallback 404 (con default del paquete)        |
 | `[name].tsx`         | Segmento dinámico                             |
 | `[...name].tsx`      | Segmento catch-all                            |
 | `(name)/`            | Grupo de rutas (sin segmento en la ruta)      |
 
-Cualquier otro archivo bajo `app/` que no empiece por `_`, no sea un
-nombre reservado y no sea importado por un hermano, se trata como una
-ruta.
+Cualquier otro archivo bajo `app/` que no sea un nombre reservado y no
+sea importado por un hermano, se trata como una ruta.

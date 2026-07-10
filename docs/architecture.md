@@ -5,7 +5,7 @@
 **Principio rector: no reinventar las primitivas nativas de bajo nivel,
 pero sí el motor de rutas.** Este paquete **no** depende de Expo ni de
 React Navigation — el árbol de rutas, la orquestación de navegación
-(qué pantalla se monta, `useRouter`, `_layout.tsx`, deep linking) y toda la
+(qué pantalla se monta, `useRouter`, `layout.tsx`, deep linking) y toda la
 API pública son código propio. Pero para las tres cosas donde reescribir
 desde cero significaría peor rendimiento y peor consistencia entre
 desarrollo y producción — gestión nativa de pantallas/memoria, gestos, y
@@ -68,7 +68,7 @@ eso `RootRouter` recibe el contexto ya evaluado como prop:
 
 ## 2. Construir el árbol de rutas
 
-`ctx.keys()` (por ejemplo, `./users/[id].tsx`, `./(tabs)/_layout.tsx`) se
+`ctx.keys()` (por ejemplo, `./users/[id].tsx`, `./(tabs)/layout.tsx`) se
 parsea en un árbol anidado:
 
 ```ts
@@ -77,7 +77,7 @@ interface RouteNode {
   type: 'static' | 'dynamic' | 'catchAll' | 'group';
   paramName?: string;         // para dynamic/catchAll
   component?: ComponentType;  // resuelto vía ctx(key)
-  layout?: ComponentType;     // el _layout.tsx de esta carpeta, si existe
+  layout?: ComponentType;     // el layout.tsx de esta carpeta, si existe
   notFound?: ComponentType;
   children: RouteNode[];
 }
@@ -137,7 +137,7 @@ son azúcar sintáctico sobre `dispatch` de este reducer, resuelto contra el
   (por ejemplo, el drawer de la sección 6/trabajo futuro), se usa
   `react-native-gesture-handler` (`Gesture.Pan()` + `GestureDetector`),
   que reconoce el gesto en el hilo de UI en vez del hilo de JS.
-- Las transiciones personalizadas (cuando `_layout.tsx` pide una animación
+- Las transiciones personalizadas (cuando `layout.tsx` pide una animación
   distinta a la nativa por defecto, por ejemplo un fade o un slide
   vertical) se implementan con `react-native-reanimated`
   (`useSharedValue` + `useAnimatedStyle` + `withTiming`/`withSpring`),
@@ -218,7 +218,7 @@ Sin dependencias runtime propias. Nada de `@react-navigation/*`, nada de
 son deliberadas: cubren gestión nativa de pantallas, gestos y animación
 (sección 3.4) — `react-native-worklets` es el runtime de worklets que
 `react-native-reanimated` v4+ requiere como paquete separado. Todo lo demás
-(árbol de rutas, `_layout.tsx`, hooks, deep linking) es código propio del
+(árbol de rutas, `layout.tsx`, hooks, deep linking) es código propio del
 paquete.
 
 ## 6. Estructura del paquete (propuesta)

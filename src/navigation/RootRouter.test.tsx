@@ -48,7 +48,7 @@ describe('RootRouter integration', () => {
     expect(screen.getByText('broken link')).toBeTruthy();
   });
 
-  it('passes through nested folders without a _layout', async () => {
+  it('passes through nested folders without a layout', async () => {
     const ctx = fakeContext({
       './index.tsx': Home,
       './deep/nested/page.tsx': DeepPage,

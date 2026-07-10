@@ -17,7 +17,7 @@ puro, pero exige escribir a mano el árbol de navegadores.
 
 **Este paquete no depende de ninguno de los dos**, pero tampoco reinventa
 todo desde cero: el árbol de rutas y la orquestación de navegación
-(`_layout.tsx`, `useRouter`, deep linking) son código propio, mientras que
+(`layout.tsx`, `useRouter`, deep linking) son código propio, mientras que
 la gestión nativa de pantallas/memoria, los gestos y las animaciones — las
 tres piezas donde reescribir desde cero cuesta rendimiento — se apoyan en
 tres librerías nativas estándar y preparadas para la Nueva Arquitectura:
@@ -29,7 +29,7 @@ Con esto, una app RN obtiene:
 
 - Un directorio `app/` donde el árbol de archivos *es* el árbol de rutas.
 - Segmentos dinámicos (`[id].tsx`), segmentos catch-all (`[...slug].tsx`),
-  grupos de rutas (`(group)/`) y layouts (`_layout.tsx`) — el mismo modelo
+  grupos de rutas (`(group)/`) y layouts (`layout.tsx`) — el mismo modelo
   mental que Expo Router / Next.js.
 - Un navegador de pilas (stack) y de pestañas (tabs) propios, con
   transiciones y gestos ejecutados en el hilo nativo de UI (no en JS), con

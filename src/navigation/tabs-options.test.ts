@@ -11,7 +11,7 @@ import { matchPath } from '../route-tree/match';
 const resolve = (key: string) => key;
 const tree = parse(
   [
-    './(tabs)/_layout.tsx',
+    './(tabs)/layout.tsx',
     './(tabs)/home.tsx',
     './(tabs)/profile.tsx',
     './(auth)/login.tsx',
@@ -50,7 +50,7 @@ describe('resolveTabs', () => {
 
   it('includes the folder index route as the "index" tab', () => {
     const flatTree = parse(
-      ['./_layout.tsx', './index.tsx', './settings.tsx'],
+      ['./layout.tsx', './index.tsx', './settings.tsx'],
       resolve,
     );
     expect(resolveTabs(flatTree, undefined)).toEqual([
@@ -74,7 +74,7 @@ describe('hrefForTab', () => {
 
   it('maps the "index" tab to the folder path itself', () => {
     const flatTree = parse(
-      ['./_layout.tsx', './index.tsx', './settings.tsx'],
+      ['./layout.tsx', './index.tsx', './settings.tsx'],
       resolve,
     );
     const match = matchPath(flatTree, '/');

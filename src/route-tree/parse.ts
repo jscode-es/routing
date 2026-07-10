@@ -58,7 +58,7 @@ export function parse<C>(
       node = childFolder(node, segment);
     }
 
-    if (fileName === '_layout') {
+    if (fileName === 'layout') {
       node.layout = resolve(key);
     } else if (fileName === 'not-found') {
       node.notFound = resolve(key);

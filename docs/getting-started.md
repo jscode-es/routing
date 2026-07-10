@@ -97,14 +97,14 @@ necesita `react-native-gesture-handler` — no hace falta añadirlo a mano.
 
 ```
 app/
-  _layout.tsx
+  layout.tsx
   index.tsx
   users/
     [id].tsx
 ```
 
 ```tsx
-// app/_layout.tsx
+// app/layout.tsx
 import { Stack } from '@jscode/react-native-routing';
 
 export default function RootLayout() {

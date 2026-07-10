@@ -8,17 +8,17 @@ y `react-native-reanimated`.
 
 ```
 app/
-  _layout.tsx        → <Stack> raíz
+  layout.tsx         → <Stack> raíz
   index.tsx          → /
   users/[id].tsx     → /users/:id
-  (tabs)/_layout.tsx → <Tabs>
+  (tabs)/layout.tsx  → <Tabs>
   not-found.tsx      → fallback 404 (opcional)
 ```
 
 ## Características
 
 - Rutas por archivos: estáticas, dinámicas (`[id]`), catch-all
-  (`[...slug]`), grupos (`(group)`), layouts anidados (`_layout.tsx`) y
+  (`[...slug]`), grupos (`(group)`), layouts anidados (`layout.tsx`) y
   `not-found` (con pantalla 404 por defecto si la app no la define).
 - `<Stack>` nativo (`ScreenStack`): transiciones push/pop nativas, header
   nativo, `presentation: 'modal'`, botón físico atrás en Android,

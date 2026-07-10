@@ -63,16 +63,16 @@ describe('parse', () => {
     expect(child(tabs, 'profile').component).toBe('./(tabs)/profile.tsx');
   });
 
-  it('attaches _layout.tsx to the folder node, not as a child', () => {
-    const tree = parse(['./(tabs)/_layout.tsx', './(tabs)/home.tsx'], resolve);
+  it('attaches layout.tsx to the folder node, not as a child', () => {
+    const tree = parse(['./(tabs)/layout.tsx', './(tabs)/home.tsx'], resolve);
     const tabs = child(tree, '(tabs)');
-    expect(tabs.layout).toBe('./(tabs)/_layout.tsx');
+    expect(tabs.layout).toBe('./(tabs)/layout.tsx');
     expect(tabs.children.map((c) => c.segment)).toEqual(['home']);
   });
 
-  it('attaches a root _layout.tsx to the root node', () => {
-    const tree = parse(['./_layout.tsx', './index.tsx'], resolve);
-    expect(tree.layout).toBe('./_layout.tsx');
+  it('attaches a root layout.tsx to the root node', () => {
+    const tree = parse(['./layout.tsx', './index.tsx'], resolve);
+    expect(tree.layout).toBe('./layout.tsx');
     expect(tree.component).toBe('./index.tsx');
   });
 
@@ -98,24 +98,24 @@ describe('parse', () => {
   it('parses nested groups and layouts several levels deep', () => {
     const tree = parse(
       [
-        './_layout.tsx',
+        './layout.tsx',
         './(auth)/login.tsx',
-        './(tabs)/_layout.tsx',
+        './(tabs)/layout.tsx',
         './(tabs)/home.tsx',
-        './(tabs)/settings/_layout.tsx',
+        './(tabs)/settings/layout.tsx',
         './(tabs)/settings/index.tsx',
         './(tabs)/settings/notifications.tsx',
       ],
       resolve,
     );
-    expect(tree.layout).toBe('./_layout.tsx');
+    expect(tree.layout).toBe('./layout.tsx');
     const auth = child(tree, '(auth)');
     expect(auth.type).toBe('group');
     expect(child(auth, 'login').component).toBe('./(auth)/login.tsx');
     const tabs = child(tree, '(tabs)');
-    expect(tabs.layout).toBe('./(tabs)/_layout.tsx');
+    expect(tabs.layout).toBe('./(tabs)/layout.tsx');
     const settings = child(tabs, 'settings');
-    expect(settings.layout).toBe('./(tabs)/settings/_layout.tsx');
+    expect(settings.layout).toBe('./(tabs)/settings/layout.tsx');
     expect(settings.component).toBe('./(tabs)/settings/index.tsx');
     expect(child(settings, 'notifications').component).toBe(
       './(tabs)/settings/notifications.tsx',
@@ -127,21 +127,21 @@ describe('deep nesting', () => {
   it('builds three levels of folders with layouts at each level', () => {
     const tree = parse(
       [
-        './_layout.tsx',
-        './a/_layout.tsx',
+        './layout.tsx',
+        './a/layout.tsx',
         './a/index.tsx',
-        './a/b/_layout.tsx',
+        './a/b/layout.tsx',
         './a/b/index.tsx',
         './a/b/c.tsx',
       ],
       (key: string) => key,
     );
-    expect(tree.layout).toBe('./_layout.tsx');
+    expect(tree.layout).toBe('./layout.tsx');
     const a = tree.children.find((n) => n.segment === 'a');
-    expect(a?.layout).toBe('./a/_layout.tsx');
+    expect(a?.layout).toBe('./a/layout.tsx');
     expect(a?.component).toBe('./a/index.tsx');
     const b = a?.children.find((n) => n.segment === 'b');
-    expect(b?.layout).toBe('./a/b/_layout.tsx');
+    expect(b?.layout).toBe('./a/b/layout.tsx');
     expect(b?.component).toBe('./a/b/index.tsx');
     const c = b?.children.find((n) => n.segment === 'c');
     expect(c?.component).toBe('./a/b/c.tsx');

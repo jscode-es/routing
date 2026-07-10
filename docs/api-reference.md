@@ -11,7 +11,7 @@
 Navegador de pila propio (no es `@react-navigation/native-stack`), pero
 construido sobre `react-native-screens` (`ScreenStack`/`Screen`) para la
 gestión nativa de pantallas/memoria y sobre `react-native-reanimated` para
-las transiciones. Se usa en un `_layout.tsx` para renderizar una pila sobre
+las transiciones. Se usa en un `layout.tsx` para renderizar una pila sobre
 los hijos de la carpeta.
 
 ```tsx
@@ -40,7 +40,7 @@ Incluye gesto de swipe-to-go-back en iOS (nativo, vía `react-native-screens`)
 y manejo del botón físico "atrás" en Android (ver
 [architecture.md](./architecture.md#3-motor-de-navegación-propio-sobre-primitivas-nativas)).
 Un navegador anidado (por ejemplo, un sub-`<Stack>`) debe declararse en el
-`_layout.tsx` de un hijo directo del navegador padre: las entradas que
+`layout.tsx` de un hijo directo del navegador padre: las entradas que
 comparten ese hijo se agrupan en una sola pantalla del stack exterior y el
 push entra al navegador interior.
 
@@ -58,7 +58,7 @@ Opciones soportadas: `title` (etiqueta de la pestaña; por defecto, el
 ### `<Slot>`
 
 Renderiza la ruta hija actualmente resuelta sin añadir un navegador extra —
-se usa cuando una carpeta necesita un `_layout.tsx` (por ejemplo, para
+se usa cuando una carpeta necesita un `layout.tsx` (por ejemplo, para
 inyectar un provider/header compartido) sin introducir un nuevo nivel de
 Stack/Tabs.
 
@@ -95,7 +95,7 @@ renderizada*, por ejemplo `{ id: '42' }` para `app/users/[id].tsx`.
 
 Igual que el anterior, pero incluye los parámetros de todos los segmentos
 resueltos a lo largo del árbol, no solo los de la pantalla final — útil
-dentro de un `_layout.tsx` compartido.
+dentro de un `layout.tsx` compartido.
 
 ### `usePathname()`
 
