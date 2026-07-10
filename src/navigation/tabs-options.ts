@@ -2,8 +2,17 @@ import React from 'react';
 import type { ReactNode } from 'react';
 import type { RouteNode } from '../route-tree/types';
 
+export interface TabIconProps {
+  focused: boolean;
+  color: string;
+  size: number;
+}
+
 export interface TabsScreenOptions {
   title?: string;
+  // Render prop: el consumidor trae su propio icono (Image, SVG,
+  // vector-icons, un emoji en un Text...), el paquete no bundlea ninguno.
+  icon?: (props: TabIconProps) => ReactNode;
 }
 
 export interface TabsScreenProps {

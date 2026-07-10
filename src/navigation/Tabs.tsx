@@ -21,6 +21,10 @@ import type { NavigationEntry } from './reducer';
 import { screenNameForEntry } from './stack-options';
 import { hrefForTab, resolveTabs, TabsScreen } from './tabs-options';
 
+const ACTIVE_COLOR = '#0a7ea4';
+const INACTIVE_COLOR = '#8e8e93';
+const ICON_SIZE = 24;
+
 const styles = StyleSheet.create({
   root: { flex: 1 },
   container: { flex: 1 },
@@ -37,16 +41,19 @@ const styles = StyleSheet.create({
   item: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 12,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    gap: 2,
+    minHeight: 48,
   },
-  label: { color: '#8e8e93', fontSize: 13 },
-  labelActive: { color: '#0a7ea4', fontSize: 13, fontWeight: '600' },
+  label: { color: INACTIVE_COLOR, fontSize: 13 },
+  labelActive: { color: ACTIVE_COLOR, fontSize: 13, fontWeight: '600' },
   indicator: {
     position: 'absolute',
     top: 0,
     left: 0,
     height: 2,
-    backgroundColor: '#0a7ea4',
+    backgroundColor: ACTIVE_COLOR,
   },
 });
 
@@ -78,9 +85,11 @@ function TabFade({
 function TabsComponent({
   children,
   animation = 'none',
+  showLabel = true,
 }: {
   children?: ReactNode;
   animation?: 'none' | 'fade';
+  showLabel?: boolean;
 }): React.JSX.Element {
   const { tree, activeEntry } = useRouterState();
   const layoutDepth = useContext(DepthContext);
@@ -178,9 +187,16 @@ function TabsComponent({
                   switchTab?.(hrefForTab(chain, layoutDepth, tab.name))
                 }
               >
-                <Text style={active ? styles.labelActive : styles.label}>
-                  {tab.options.title ?? tab.name}
-                </Text>
+                {tab.options.icon?.({
+                  focused: active,
+                  color: active ? ACTIVE_COLOR : INACTIVE_COLOR,
+                  size: ICON_SIZE,
+                })}
+                {showLabel && (
+                  <Text style={active ? styles.labelActive : styles.label}>
+                    {tab.options.title ?? tab.name}
+                  </Text>
+                )}
               </Pressable>
             );
           })}

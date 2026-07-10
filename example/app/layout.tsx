@@ -12,10 +12,7 @@ export default function RootLayout() {
         name="(auth)"
         options={{ title: 'Login', headerShown: false }}
       />
-      <Stack.Screen
-        name="users"
-        options={{ title: 'Usuario', animation: 'fade' }}
-      />
+      <Stack.Screen name="users" options={{ title: 'Usuario' }} />
       <Stack.Screen
         name="modal"
         options={{

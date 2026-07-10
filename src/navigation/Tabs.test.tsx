@@ -114,6 +114,63 @@ describe('Tabs', () => {
     expect(screen.queryAllByTestId('tab-fade')).toHaveLength(0);
   });
 
+  it('renders tab icons with focused state and colors', async () => {
+    const IconLayout = () => (
+      <Tabs>
+        <Tabs.Screen
+          name="home"
+          options={{
+            title: 'Inicio',
+            icon: ({ focused, color, size }) => (
+              <Text testID="icon-home" style={{ color, fontSize: size }}>
+                {focused ? '★' : '☆'}
+              </Text>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: 'Perfil',
+            icon: ({ focused }) => (
+              <Text testID="icon-profile">{focused ? '●' : '○'}</Text>
+            ),
+          }}
+        />
+      </Tabs>
+    );
+    await render(
+      <RootRouter context={makeContext(IconLayout)} initialPath="/home" />,
+    );
+    expect(screen.getByTestId('icon-home').props.children).toBe('★');
+    expect(screen.getByTestId('icon-profile').props.children).toBe('○');
+
+    await fireEvent.press(screen.getByTestId('tab-profile'));
+    expect(screen.getByTestId('icon-home').props.children).toBe('☆');
+    expect(screen.getByTestId('icon-profile').props.children).toBe('●');
+  });
+
+  it('hides labels in icon-only mode with showLabel={false}', async () => {
+    const IconOnlyLayout = () => (
+      <Tabs showLabel={false}>
+        <Tabs.Screen
+          name="home"
+          options={{
+            title: 'Inicio',
+            icon: () => <Text testID="icon-home">☆</Text>,
+          }}
+        />
+        <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
+      </Tabs>
+    );
+    await render(
+      <RootRouter context={makeContext(IconOnlyLayout)} initialPath="/home" />,
+    );
+    expect(screen.getByTestId('icon-home')).toBeTruthy();
+    expect(screen.queryByText('Inicio')).toBeNull();
+    expect(screen.queryByText('Perfil')).toBeNull();
+  });
+
   it('keeps tab state when nested inside a root Stack', async () => {
     const RootStackLayout = () => <Stack />;
     const ctx = fakeContext({

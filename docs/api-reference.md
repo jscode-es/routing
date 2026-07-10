@@ -63,9 +63,29 @@ con reanimated) y `react-native-screens` para congelar nativamente las
 pestañas inactivas, que conservan su estado local al cambiar de tab.
 Mismo comportamiento de auto-registro que `<Stack>`: sin `<Tabs.Screen>`
 explícitos, las rutas hermanas de la carpeta se convierten en pestañas.
-Opciones soportadas: `title` (etiqueta de la pestaña; por defecto, el
-`name`). `<Tabs>` acepta la prop `animation` (`'none'` por defecto,
-`'fade'` funde el contenido al cambiar de pestaña con reanimated).
+
+Opciones de `<Tabs.Screen>`: `title` (etiqueta; por defecto, el `name`) e
+`icon`, una render prop `({ focused, color, size }) => ReactNode` — el
+paquete no bundlea ningún set de iconos, pasa el tuyo (un `Image`, un SVG,
+`react-native-vector-icons`, un emoji en un `Text`...):
+
+```tsx
+<Tabs showLabel={false}>
+  <Tabs.Screen
+    name="home"
+    options={{
+      title: 'Home',
+      icon: ({ focused, color, size }) => (
+        <HomeIcon color={color} width={size} opacity={focused ? 1 : 0.5} />
+      ),
+    }}
+  />
+</Tabs>
+```
+
+Props de `<Tabs>`: `animation` (`'none'` por defecto, `'fade'` funde el
+contenido al cambiar de pestaña con reanimated) y `showLabel` (`false`
+para modo solo-iconos).
 
 ### `<Slot>`
 
