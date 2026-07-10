@@ -50,10 +50,37 @@ const styles = StyleSheet.create({
   },
 });
 
-function TabsComponent({
+// Fade de entrada al activar una pestaña (las inactivas se descongelan al
+// volver a primer plano; el fade-out no llega a verse porque el nativo las
+// separa del árbol).
+function TabFade({
+  active,
   children,
 }: {
+  active: boolean;
+  children: ReactNode;
+}): React.JSX.Element {
+  const opacity = useSharedValue(1);
+  useEffect(() => {
+    if (active) {
+      opacity.value = 0;
+      opacity.value = withTiming(1, { duration: 200 });
+    }
+  }, [active, opacity]);
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value }), []);
+  return (
+    <Animated.View testID="tab-fade" style={[styles.container, style]}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function TabsComponent({
+  children,
+  animation = 'none',
+}: {
   children?: ReactNode;
+  animation?: 'none' | 'fade';
 }): React.JSX.Element {
   const { tree, activeEntry } = useRouterState();
   const layoutDepth = useContext(DepthContext);
@@ -119,7 +146,13 @@ function TabsComponent({
               activityState={active ? 2 : 0}
             >
               <EntryContext.Provider value={entry}>
-                <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
+                {animation === 'fade' ? (
+                  <TabFade active={active}>
+                    <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
+                  </TabFade>
+                ) : (
+                  <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
+                )}
               </EntryContext.Provider>
             </Screen>
           );

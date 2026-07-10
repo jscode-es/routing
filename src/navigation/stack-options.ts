@@ -3,9 +3,21 @@ import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import type { NavigationEntry } from './reducer';
 
+export type StackAnimation =
+  | 'default'
+  | 'fade'
+  | 'fade_from_bottom'
+  | 'flip'
+  | 'none'
+  | 'simple_push'
+  | 'slide_from_bottom'
+  | 'slide_from_right'
+  | 'slide_from_left';
+
 export interface StackScreenOptions {
   title?: string;
   presentation?: 'push' | 'modal' | 'transparentModal' | 'formSheet';
+  animation?: StackAnimation;
   contentStyle?: StyleProp<ViewStyle>;
   headerShown?: boolean;
   // Solo aplica con headerShown: false (con header, el inset superior lo

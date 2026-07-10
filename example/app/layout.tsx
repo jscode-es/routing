@@ -12,7 +12,10 @@ export default function RootLayout() {
         name="(auth)"
         options={{ title: 'Login', headerShown: false }}
       />
-      <Stack.Screen name="users" options={{ title: 'Usuario' }} />
+      <Stack.Screen
+        name="users"
+        options={{ title: 'Usuario', animation: 'fade' }}
+      />
       <Stack.Screen
         name="modal"
         options={{
@@ -23,7 +26,10 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: '#111' },
         }}
       />
-      <Stack.Screen name="not-found" options={{ title: 'No encontrado' }} />
+      <Stack.Screen
+        name="not-found"
+        options={{ title: 'No encontrado', animation: 'none' }}
+      />
     </Stack>
   );
 }

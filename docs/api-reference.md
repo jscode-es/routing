@@ -37,6 +37,7 @@ hace falta para sobreescribir opciones por pantalla. Opciones soportadas:
 | `headerShown` | `false` oculta el header nativo (por defecto `true`). |
 | `safeArea` | Solo con `headerShown: false`: `true` (default) aplica el inset superior; `false` deja el contenido a sangre bajo la barra de estado (full-bleed, estilo OTT). Con header visible el inset lo gestiona el propio header. |
 | `presentation` | `'push' \| 'modal' \| 'transparentModal' \| 'formSheet'`. |
+| `animation` | Transición nativa de la pantalla: `'default' \| 'fade' \| 'fade_from_bottom' \| 'flip' \| 'none' \| 'simple_push' \| 'slide_from_bottom' \| 'slide_from_right' \| 'slide_from_left'`. `'none'` la desactiva. |
 | `contentStyle` | Estilo del contenedor de la pantalla; por defecto lleva un fondo opaco `#f2f2f2` para que las transiciones push/pop no se mezclen con la pantalla inferior (`transparentModal` no lo aplica). |
 
 ```tsx
@@ -63,7 +64,8 @@ pestañas inactivas, que conservan su estado local al cambiar de tab.
 Mismo comportamiento de auto-registro que `<Stack>`: sin `<Tabs.Screen>`
 explícitos, las rutas hermanas de la carpeta se convierten en pestañas.
 Opciones soportadas: `title` (etiqueta de la pestaña; por defecto, el
-`name`).
+`name`). `<Tabs>` acepta la prop `animation` (`'none'` por defecto,
+`'fade'` funde el contenido al cambiar de pestaña con reanimated).
 
 ### `<Slot>`
 

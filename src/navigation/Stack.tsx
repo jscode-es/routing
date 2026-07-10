@@ -131,6 +131,7 @@ function StackComponent({
             freezeOnBlur
             shouldFreeze={index < groups.length - 2}
             stackPresentation={options.presentation ?? 'push'}
+            stackAnimation={options.animation}
             onDismissed={(event) => {
               const pops = event.nativeEvent.dismissCount * group.entries.length;
               for (let i = 0; i < pops; i++) {

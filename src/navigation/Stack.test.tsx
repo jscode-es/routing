@@ -273,6 +273,32 @@ describe('Stack', () => {
     expect(screen.getAllByTestId('safe-area')).toHaveLength(1);
   });
 
+  it('maps the animation option to the native stackAnimation prop', async () => {
+    const Layout = () => (
+      <Stack>
+        <Stack.Screen name="index" options={{ animation: 'fade' }} />
+        <Stack.Screen name="users" options={{ animation: 'none' }} />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': Layout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    await fireEvent.press(screen.getByTestId('go'));
+    const screens = screen.getAllByTestId('screen');
+    expect(screens[0]?.props.stackAnimation).toBe('fade');
+    expect(screens[1]?.props.stackAnimation).toBe('none');
+  });
+
+  it('leaves the native default animation without the option', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    expect(
+      screen.getAllByTestId('screen')[0]?.props.stackAnimation,
+    ).toBeUndefined();
+  });
+
   it('falls back to the screen name as title without explicit options', async () => {
     const PlainLayout = () => <Stack />;
     const ctx = fakeContext({

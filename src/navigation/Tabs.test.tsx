@@ -93,6 +93,27 @@ describe('Tabs', () => {
     expect(screen.getByTestId('tab-home')).toBeTruthy();
   });
 
+  it('fades tab content when animation="fade"', async () => {
+    const FadeLayout = () => (
+      <Tabs animation="fade">
+        <Tabs.Screen name="home" options={{ title: 'Inicio' }} />
+        <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
+      </Tabs>
+    );
+    await render(
+      <RootRouter context={makeContext(FadeLayout)} initialPath="/home" />,
+    );
+    expect(screen.getAllByTestId('tab-fade')).toHaveLength(2);
+
+    await fireEvent.press(screen.getByTestId('tab-profile'));
+    expect(screen.getByText('Profile screen')).toBeTruthy();
+  });
+
+  it('renders without fade wrappers by default', async () => {
+    await render(<RootRouter context={makeContext()} initialPath="/home" />);
+    expect(screen.queryAllByTestId('tab-fade')).toHaveLength(0);
+  });
+
   it('keeps tab state when nested inside a root Stack', async () => {
     const RootStackLayout = () => <Stack />;
     const ctx = fakeContext({
