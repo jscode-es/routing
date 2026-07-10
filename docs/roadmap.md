@@ -53,7 +53,7 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
 ## Fase 1 — Motor de rutas puro: parser + matcher ✅
 
 - [x] `parse.test.ts` + `parse.ts`: estáticas, `index`, `[id]`,
-      `[...slug]`, grupos `(group)`, `_layout`, `+not-found`, error por
+      `[...slug]`, grupos `(group)`, `_layout`, `not-found`, error por
       conflicto `foo.tsx` + `foo/index.tsx`
 - [x] `match.test.ts` + `match.ts`: extracción de params, prioridad
       estático > dinámico, catch-all multi-segmento, grupos transparentes,
@@ -138,19 +138,21 @@ Notas técnicas que quedaron resueltas aquí:
 ## Fase 6 — Layouts anidados, grupos, not-found ✅
 
 - [x] TDD: integración en `RootRouter.test.tsx` (path inexistente →
-      `+not-found`, pass-through implícito sin `_layout`), `parse.test.ts`
+      `not-found`, pass-through implícito sin `_layout`), `parse.test.ts`
       con 3 niveles de anidamiento
 - [x] `example/`: mini-`<Stack>` dentro de `(tabs)/settings/_layout.tsx`,
-      `app/+not-found.tsx`, un `<Link>` roto visible
+      `app/not-found.tsx`, un `<Link>` roto visible
 - [x] **Checklist manual Android**: link roto → not-found; sub-stack de
       settings independiente del stack raíz
 
 Notas técnicas que quedaron resueltas aquí:
 
-- `matchNotFound` fabrica una hoja virtual para `+not-found` (parse la
+- `matchNotFound` fabrica una hoja virtual para `not-found` (parse la
   guarda en `root.notFound`, no como nodo); push/replace e initialPath
-  caen a ella cuando no hay match (y siguen lanzando si tampoco hay
-  `+not-found`).
+  caen a ella cuando no hay match. Si la app no define `not-found.tsx`,
+  se usa la pantalla 404 por defecto del paquete (`DefaultNotFound`).
+  La convención fue `+not-found.tsx` hasta que se renombró a
+  `not-found.tsx` (nombre reservado, sin `+`).
 - `Stack` acota sus entradas al subárbol de su layout (vía `EntryContext`)
   y agrupa las entradas consecutivas cuyo hijo directo tiene `_layout`
   propio en una sola `Screen`: el push entra al navegador anidado sin
@@ -170,7 +172,7 @@ Notas técnicas que quedaron resueltas aquí:
 Notas: `urlToPath` trata el "host" del esquema propio como primer segmento
 (`routingexample://share/42` → `/share/42`); `getInitialURL` hace `replace`
 (sin historial en frío) y los eventos `url` hacen `push`; una URL sin match
-cae en `+not-found`.
+cae en `not-found`.
 
 ## Fase 8 — Pulido y empaquetado npm ✅ (release 1.0 pendiente de iOS)
 

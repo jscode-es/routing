@@ -105,19 +105,22 @@ Router).
 
 ## Ruta not-found
 
-`app/+not-found.tsx` se renderiza cuando ninguna ruta coincide — se usa
-como pantalla de fallback `NotFound` en la config de navegador/linking
-generada.
+`app/not-found.tsx` se renderiza cuando ninguna ruta coincide (initialPath
+desconocido, `Link`/`push` a un href sin match, deep link roto). Es un
+nombre reservado: no genera la ruta `/not-found`. Si la app no lo define,
+el router muestra una pantalla 404 por defecto del propio paquete — no
+hace falta añadir nada.
 
 ## Nombres reservados
 
 | Nombre            | Propósito                                    |
 | ------------------- | ---------------------------------------------- |
 | `_layout.tsx`        | Navegador/layout de la carpeta                |
-| `+not-found.tsx`     | Fallback 404                                  |
+| `not-found.tsx`      | Fallback 404 (con default del paquete)        |
 | `[name].tsx`         | Segmento dinámico                             |
 | `[...name].tsx`      | Segmento catch-all                            |
 | `(name)/`            | Grupo de rutas (sin segmento en la ruta)      |
 
-Cualquier otro archivo bajo `app/` que no empiece por `_` ni `+`, y que no
-sea importado por un hermano, se trata como una ruta.
+Cualquier otro archivo bajo `app/` que no empiece por `_`, no sea un
+nombre reservado y no sea importado por un hermano, se trata como una
+ruta.

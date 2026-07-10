@@ -86,14 +86,20 @@ function matchChildren<C>(
   return null;
 }
 
-// Match sintético para app/+not-found.tsx: no existe como nodo del árbol
+// Match sintético para app/not-found.tsx: no existe como nodo del árbol
 // (parse lo guarda en root.notFound), así que se fabrica una hoja virtual.
-export function matchNotFound<C>(tree: RouteNode<C>): RouteMatch<C> | null {
-  if (tree.notFound === undefined) return null;
+// `fallback` permite al runtime inyectar una pantalla 404 por defecto
+// cuando la app no define la suya.
+export function matchNotFound<C>(
+  tree: RouteNode<C>,
+  fallback?: C,
+): RouteMatch<C> | null {
+  const component = tree.notFound ?? fallback;
+  if (component === undefined) return null;
   const node: RouteNode<C> = {
-    segment: '+not-found',
+    segment: 'not-found',
     type: 'static',
-    component: tree.notFound,
+    component,
     children: [],
   };
   return { node, params: {}, chain: [tree, node] };

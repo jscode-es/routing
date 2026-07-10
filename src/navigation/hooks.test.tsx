@@ -84,7 +84,7 @@ describe('useRouter navigation', () => {
     expect(screen.getByText('User 99')).toBeTruthy();
   });
 
-  it('push to an unknown route throws a clear error', async () => {
+  it('push to an unknown route lands on the built-in 404 screen', async () => {
     const BadLink = () => {
       const r = useRouter();
       return (
@@ -96,9 +96,8 @@ describe('useRouter navigation', () => {
     await render(
       <RootRouter context={fakeContext({ './index.tsx': BadLink })} />,
     );
-    await expect(
-      fireEvent.press(screen.getByTestId('bad')),
-    ).rejects.toThrow(/No route matches/);
+    await fireEvent.press(screen.getByTestId('bad'));
+    expect(screen.getByText('404')).toBeTruthy();
   });
 });
 

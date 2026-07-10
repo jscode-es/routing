@@ -76,9 +76,9 @@ describe('parse', () => {
     expect(tree.component).toBe('./index.tsx');
   });
 
-  it('attaches +not-found.tsx to the folder node', () => {
-    const tree = parse(['./+not-found.tsx', './index.tsx'], resolve);
-    expect(tree.notFound).toBe('./+not-found.tsx');
+  it('attaches not-found.tsx to the folder node instead of routing it', () => {
+    const tree = parse(['./not-found.tsx', './index.tsx'], resolve);
+    expect(tree.notFound).toBe('./not-found.tsx');
     expect(tree.children).toHaveLength(0);
   });
 

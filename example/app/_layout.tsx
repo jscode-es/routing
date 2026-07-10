@@ -1,5 +1,5 @@
-import React from 'react';
 import { Stack } from '@jscode/react-native-routing';
+import React from 'react';
 
 export default function RootLayout() {
   return (
@@ -11,7 +11,7 @@ export default function RootLayout() {
         name="modal"
         options={{ title: 'Modal', presentation: 'modal' }}
       />
-      <Stack.Screen name="+not-found" options={{ title: 'No encontrado' }} />
+      <Stack.Screen name="not-found" options={{ title: 'No encontrado' }} />
     </Stack>
   );
 }

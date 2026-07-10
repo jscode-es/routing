@@ -10,11 +10,13 @@ import {
   TabSwitchContext,
 } from './RouterContext';
 import { useDeepLinks } from './linking';
+import { DefaultNotFound } from './NotFound';
 import { setActiveRouter } from './router';
 import type { Router } from './router';
 
 function initialState(tree: RouteNode, initialPath: string): NavigationState {
-  const match = matchPath(tree, initialPath) ?? matchNotFound(tree);
+  const match =
+    matchPath(tree, initialPath) ?? matchNotFound(tree, DefaultNotFound);
   return { stack: match ? [createEntry(initialPath, match)] : [] };
 }
 
@@ -38,7 +40,8 @@ export function NavigationProvider({
 
   const api = useMemo<Router>(() => {
     const resolve = (href: string) => {
-      const match = matchPath(tree, href) ?? matchNotFound(tree);
+      const match =
+        matchPath(tree, href) ?? matchNotFound(tree, DefaultNotFound);
       if (!match) {
         throw new Error(`No route matches "${href}"`);
       }

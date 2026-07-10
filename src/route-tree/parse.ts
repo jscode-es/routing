@@ -60,7 +60,7 @@ export function parse<C>(
 
     if (fileName === '_layout') {
       node.layout = resolve(key);
-    } else if (fileName === '+not-found') {
+    } else if (fileName === 'not-found') {
       node.notFound = resolve(key);
     } else if (fileName === 'index') {
       if (node.component !== undefined) {

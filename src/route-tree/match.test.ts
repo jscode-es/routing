@@ -82,17 +82,30 @@ describe('matchPath', () => {
 });
 
 describe('matchNotFound', () => {
-  it('builds a synthetic match for the root +not-found route', () => {
-    const tree = parse(['./index.tsx', './+not-found.tsx'], resolve);
+  it('builds a synthetic match for the root not-found route', () => {
+    const tree = parse(['./index.tsx', './not-found.tsx'], resolve);
     const result = matchNotFound(tree);
-    expect(result?.node.component).toBe('./+not-found.tsx');
-    expect(result?.node.segment).toBe('+not-found');
+    expect(result?.node.component).toBe('./not-found.tsx');
+    expect(result?.node.segment).toBe('not-found');
     expect(result?.chain).toHaveLength(2);
     expect(result?.chain[0]).toBe(tree);
     expect(result?.params).toEqual({});
   });
 
-  it('returns null when the tree has no +not-found route', () => {
+  it('uses the fallback component when the tree has no not-found route', () => {
+    const tree = parse(['./index.tsx'], resolve);
+    const result = matchNotFound(tree, 'default-404');
+    expect(result?.node.component).toBe('default-404');
+    expect(result?.node.segment).toBe('not-found');
+  });
+
+  it('prefers the app not-found route over the fallback', () => {
+    const tree = parse(['./index.tsx', './not-found.tsx'], resolve);
+    const result = matchNotFound(tree, 'default-404');
+    expect(result?.node.component).toBe('./not-found.tsx');
+  });
+
+  it('returns null without not-found route nor fallback', () => {
     const tree = parse(['./index.tsx'], resolve);
     expect(matchNotFound(tree)).toBeNull();
   });

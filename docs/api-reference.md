@@ -27,7 +27,7 @@ export default function Layout() {
 
 El `name` de cada pantalla es el primer segmento de ruta por debajo del
 layout (`users` para `users/[id].tsx`, `index` para el `index.tsx` de la
-propia carpeta, `(tabs)` para un grupo, `+not-found` para el fallback).
+propia carpeta, `(tabs)` para un grupo, `not-found` para el fallback).
 Las rutas se registran automáticamente: `<Stack.Screen>` explícito solo
 hace falta para sobreescribir opciones por pantalla. Opciones soportadas:
 `title` (header nativo; por defecto, el `name`), `presentation`
@@ -71,7 +71,8 @@ Stack/Tabs.
 Renderiza un `Pressable`/`Text` (componentes core de React Native) que
 llama a `router.push(href)` al pulsarlo. Acepta las props `replace`
 (usa `router.replace` en lugar de `push`) y `style` (estilo del `Text`).
-Un `href` sin ruta coincidente navega a `+not-found` si existe.
+Un `href` sin ruta coincidente navega a `app/not-found.tsx` (o a la
+pantalla 404 por defecto del paquete si la app no lo define).
 
 ## Hooks
 
