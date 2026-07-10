@@ -60,6 +60,29 @@ describe('navigation reducer', () => {
     expect(next.stack[0]?.match.params).toEqual({});
   });
 
+  it('SET_ACTIVE_TAB swaps the top entry without stacking history', () => {
+    const state = stateWith('/');
+    const originalKey = state.stack[0]?.key;
+    const next = reducer(state, {
+      type: 'SET_ACTIVE_TAB',
+      entry: entryFor('/users/42'),
+    });
+    expect(next.stack).toHaveLength(1);
+    expect(next.stack[0]?.pathname).toBe('/users/42');
+    // Conserva la key: un Stack contenedor no debe remontar su Screen
+    // (perdería el estado de las pestañas) al cambiar de tab.
+    expect(next.stack[0]?.key).toBe(originalKey);
+  });
+
+  it('SET_ACTIVE_TAB is a no-op when the tab is already active', () => {
+    const state = stateWith('/', '/users/42');
+    const next = reducer(state, {
+      type: 'SET_ACTIVE_TAB',
+      entry: entryFor('/users/42'),
+    });
+    expect(next).toBe(state);
+  });
+
   it('entries get unique keys even for the same pathname', () => {
     const a = entryFor('/users/42');
     const b = entryFor('/users/42');

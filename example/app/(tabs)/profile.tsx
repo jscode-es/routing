@@ -1,16 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Link } from '@jscode/react-native-routing';
+import { Link, usePathname } from '@jscode/react-native-routing';
 
-export default function Home() {
+export default function Profile() {
+  const pathname = usePathname();
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Home</Text>
-      <Link href="/users/42" style={styles.link}>
-        Ir al usuario 42
-      </Link>
-      <Link href="/modal" style={styles.link}>
-        Abrir modal
+      <Text style={styles.title}>Perfil</Text>
+      <Text>pathname: {pathname}</Text>
+      <Link href="/login" style={styles.link}>
+        Ir a login
       </Link>
     </View>
   );

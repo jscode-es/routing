@@ -18,6 +18,11 @@ export const RouterApiContext = createContext<Router | null>(null);
 // conservan sus propios params aunque activeEntry haya cambiado).
 export const EntryContext = createContext<NavigationEntry | null>(null);
 
+// Interno: cambia de pestaña sin apilar historial (SET_ACTIVE_TAB).
+export const TabSwitchContext = createContext<((href: string) => void) | null>(
+  null,
+);
+
 export const DepthContext = createContext(0);
 
 export const SlotContext = createContext<ReactNode>(null);
@@ -63,4 +68,22 @@ export function RouteLevel({
   }
 
   return <DepthContext.Provider value={index}>{body}</DepthContext.Provider>;
+}
+
+export function EntrySubtree({
+  entry,
+  layoutDepth,
+}: {
+  entry: NavigationEntry;
+  layoutDepth: number;
+}): React.JSX.Element | null {
+  const { chain } = entry.match;
+  // Ruta index: la hoja es el propio nodo del layout, no hay nivel inferior.
+  if (layoutDepth === chain.length - 1) {
+    const Component = chain[layoutDepth]?.component as
+      | ComponentType
+      | undefined;
+    return Component ? <Component /> : null;
+  }
+  return <RouteLevel chain={chain} index={layoutDepth + 1} />;
 }

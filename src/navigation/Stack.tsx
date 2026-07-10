@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import type { ComponentType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { BackHandler, StyleSheet } from 'react-native';
 import {
   Screen,
+  ScreenContentWrapper,
   ScreenStack,
   ScreenStackHeaderConfig,
 } from 'react-native-screens';
 import {
   DepthContext,
   EntryContext,
-  RouteLevel,
+  EntrySubtree,
   useRouterState,
 } from './RouterContext';
 import { useRouter } from './hooks';
-import type { NavigationEntry } from './reducer';
 import {
   collectScreenConfigs,
   createBackPressHandler,
@@ -22,24 +22,6 @@ import {
 } from './stack-options';
 
 const styles = StyleSheet.create({ fill: { flex: 1 } });
-
-function EntryContent({
-  entry,
-  layoutDepth,
-}: {
-  entry: NavigationEntry;
-  layoutDepth: number;
-}): React.JSX.Element | null {
-  const { chain } = entry.match;
-  // Ruta index: la hoja es el propio nodo del layout, no hay nivel inferior.
-  if (layoutDepth === chain.length - 1) {
-    const Component = chain[layoutDepth]?.component as
-      | ComponentType
-      | undefined;
-    return Component ? <Component /> : null;
-  }
-  return <RouteLevel chain={chain} index={layoutDepth + 1} />;
-}
 
 function StackComponent({
   children,
@@ -76,7 +58,10 @@ function StackComponent({
         return (
           <Screen
             key={entry.key}
-            style={styles.fill}
+            // absoluteFill, no flex:1 — el nativo fija la altura real del
+            // Screen (viewport menos header) vía state update, y flexGrow
+            // la pisaría estirándolo de nuevo a pantalla completa.
+            style={StyleSheet.absoluteFill}
             // En ScreenStack el activityState no puede decrecer (2 -> 0
             // lanza en nativo); el congelado va aparte con shouldFreeze.
             // Se deja sin congelar la pantalla justo bajo el top para que
@@ -91,10 +76,15 @@ function StackComponent({
               }
             }}
           >
+            {/* El nativo recoloca este wrapper bajo el header; sin él, el
+                contenido se layouta a pantalla completa y el fondo queda
+                recortado. El header config nunca puede ser el primer hijo. */}
+            <ScreenContentWrapper style={StyleSheet.absoluteFill}>
+              <EntryContext.Provider value={entry}>
+                <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
+              </EntryContext.Provider>
+            </ScreenContentWrapper>
             <ScreenStackHeaderConfig title={options.title ?? name} />
-            <EntryContext.Provider value={entry}>
-              <EntryContent entry={entry} layoutDepth={layoutDepth} />
-            </EntryContext.Provider>
           </Screen>
         );
       })}

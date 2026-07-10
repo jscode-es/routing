@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useReducer, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { matchPath } from '../route-tree/match';
 import type { RouteNode } from '../route-tree/types';
 import { createEntry, reducer } from './reducer';
@@ -7,6 +7,7 @@ import {
   RouteLevel,
   RouterApiContext,
   RouterStateContext,
+  TabSwitchContext,
 } from './RouterContext';
 import { setActiveRouter } from './router';
 import type { Router } from './router';
@@ -59,6 +60,17 @@ export function NavigationProvider({
     return () => setActiveRouter(null);
   }, [api]);
 
+  const switchTab = useCallback(
+    (href: string) => {
+      const match = matchPath(tree, href);
+      if (!match) {
+        throw new Error(`No route matches "${href}"`);
+      }
+      dispatch({ type: 'SET_ACTIVE_TAB', entry: createEntry(href, match) });
+    },
+    [tree],
+  );
+
   const activeEntry = state.stack[state.stack.length - 1];
   const routerState = useMemo(
     () => (activeEntry ? { tree, stack: state.stack, activeEntry } : null),
@@ -69,9 +81,11 @@ export function NavigationProvider({
 
   return (
     <RouterApiContext.Provider value={api}>
-      <RouterStateContext.Provider value={routerState}>
-        <RouteLevel chain={routerState.activeEntry.match.chain} index={0} />
-      </RouterStateContext.Provider>
+      <TabSwitchContext.Provider value={switchTab}>
+        <RouterStateContext.Provider value={routerState}>
+          <RouteLevel chain={routerState.activeEntry.match.chain} index={0} />
+        </RouterStateContext.Provider>
+      </TabSwitchContext.Provider>
     </RouterApiContext.Provider>
   );
 }

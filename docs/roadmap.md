@@ -87,7 +87,7 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
 - [x] `<Link href replace>`
 - [x] **Demo**: Home → Link → "User 42" → botón Volver → Home, en emulador
 
-## Fase 4 — Stack nativo (react-native-screens) 🔨 en curso
+## Fase 4 — Stack nativo (react-native-screens) ✅ (iOS pendiente)
 
 - [x] Mock manual de `react-native-screens` en `jest.setup.js`
 - [x] `stack-options.test.ts`: nombre de pantalla por entrada,
@@ -107,18 +107,33 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
 - [ ] **Checklist iOS (pendiente de Mac)**: swipe-to-go-back real y su
       cancelación a mitad de gesto, modal estilo iOS
 
-## Fase 5 — Tabs nativo ⏳
+## Fase 5 — Tabs nativo ✅ (iOS pendiente)
 
-- [ ] TDD: `tabs-options.test.ts`, acción `SET_ACTIVE_TAB` en el reducer,
+- [x] TDD: `tabs-options.test.ts`, acción `SET_ACTIVE_TAB` en el reducer,
       `Tabs.test.tsx` (pestaña activa en foreground, resto congeladas)
-- [ ] Implementar `Tabs.tsx`: barra con `View`/`Pressable`/`Text` del core,
+- [x] Implementar `Tabs.tsx`: barra con `View`/`Pressable`/`Text` del core,
       contenido de cada pestaña en `Screen` (congelado nativo), indicador
       animado con reanimated
-- [ ] `example/`: reestructurar con `(auth)/login.tsx` y
+- [x] `example/`: reestructurar con `(auth)/login.tsx` y
       `(tabs)/_layout.tsx` (Home/Profile)
-- [ ] **Checklist manual Android**: cambiar de tab conserva el estado
+- [x] **Checklist manual Android**: cambiar de tab conserva el estado
       (un `TextInput` no se resetea), indicador fluido
 - [ ] **Checklist iOS (pendiente de Mac)**
+
+Notas técnicas que quedaron resueltas aquí:
+
+- `SET_ACTIVE_TAB` conserva la `key` de la entrada superior: un `Stack`
+  contenedor no remonta su `Screen` al cambiar de pestaña (no se pierde el
+  estado de las tabs).
+- Dentro de un `ScreenStack` nativo el `activityState` no puede decrecer
+  (2 → 0 lanza en nativo): las pantallas van siempre a 2 y el congelado se
+  expresa con `freezeOnBlur`/`shouldFreeze`.
+- El contenido de un `Screen` con header nativo debe ir en un
+  `ScreenContentWrapper` (nunca con el header config como primer hijo) y el
+  `Screen` debe usar `absoluteFill`, no `flex: 1`: el nativo fija la altura
+  real (viewport menos header) vía state update de Fabric y `flexGrow` la
+  pisaría, recortando el borde inferior (la barra de tabs quedaba fuera de
+  pantalla).
 
 ## Fase 6 — Layouts anidados, grupos, not-found ⏳
 
@@ -162,6 +177,6 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
 | Botón físico "atrás" Android | A mano | ✅ Fase 4 |
 | Swipe-to-go-back iOS y su cancelación | A mano en iOS | Pendiente de Mac |
 | Congelado real de pantallas tapadas | Contador de renders + profiler nativo | Fase 4/5 |
-| Estado de pestañas al cambiar de tab | `TextInput` sin resetear | Fase 5 |
+| Estado de pestañas al cambiar de tab | `TextInput` sin resetear | ✅ Fase 5 |
 | Deep link desde fuera de la app (frío/caliente) | `adb` / `xcrun simctl` | Fase 7 |
 | Fast Refresh reevaluando `require.context` | Editar con la app corriendo | ✅ Fase 2 |

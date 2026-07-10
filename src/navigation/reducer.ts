@@ -14,6 +14,7 @@ export type NavigationAction =
   | { type: 'PUSH'; entry: NavigationEntry }
   | { type: 'POP' }
   | { type: 'REPLACE'; entry: NavigationEntry }
+  | { type: 'SET_ACTIVE_TAB'; entry: NavigationEntry }
   | { type: 'SET_PARAMS'; key: string; params: RouteParams };
 
 let nextKey = 0;
@@ -39,6 +40,14 @@ export function reducer(
     }
     case 'REPLACE':
       return { stack: [...state.stack.slice(0, -1), action.entry] };
+    case 'SET_ACTIVE_TAB': {
+      const top = state.stack[state.stack.length - 1];
+      if (top?.pathname === action.entry.pathname) return state;
+      const entry = top
+        ? { ...action.entry, key: top.key }
+        : action.entry;
+      return { stack: [...state.stack.slice(0, -1), entry] };
+    }
     case 'SET_PARAMS':
       return {
         stack: state.stack.map((entry) =>

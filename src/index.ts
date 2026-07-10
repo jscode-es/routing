@@ -6,6 +6,11 @@ export type {
   StackScreenOptions,
   StackScreenProps,
 } from './navigation/stack-options';
+export { Tabs } from './navigation/Tabs';
+export type {
+  TabsScreenOptions,
+  TabsScreenProps,
+} from './navigation/tabs-options';
 export { Link } from './navigation/Link';
 export type { LinkProps } from './navigation/Link';
 export { router } from './navigation/router';

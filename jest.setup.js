@@ -14,5 +14,30 @@ jest.mock('react-native-screens', () => {
       React.createElement(View, { testID: 'screen', ...props }, children),
     ScreenStackHeaderConfig: (props) =>
       React.createElement(View, { testID: 'header-config', ...props }),
+    ScreenContentWrapper: ({ children, ...props }) =>
+      React.createElement(
+        View,
+        { testID: 'screen-content', ...props },
+        children,
+      ),
+    ScreenContainer: ({ children, ...props }) =>
+      React.createElement(
+        View,
+        { testID: 'screen-container', ...props },
+        children,
+      ),
+  };
+});
+
+// El mock oficial de reanimated importa react-native-worklets, que necesita
+// el módulo nativo: mock manual mínimo con la API que usa el paquete.
+jest.mock('react-native-reanimated', () => {
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: { View },
+    useSharedValue: (value) => ({ value }),
+    useAnimatedStyle: (styleFactory) => styleFactory(),
+    withTiming: (value) => value,
   };
 });
