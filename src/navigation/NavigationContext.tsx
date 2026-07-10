@@ -9,6 +9,7 @@ import {
   RouterStateContext,
   TabSwitchContext,
 } from './RouterContext';
+import { useDeepLinks } from './linking';
 import { setActiveRouter } from './router';
 import type { Router } from './router';
 
@@ -59,6 +60,8 @@ export function NavigationProvider({
     setActiveRouter(api);
     return () => setActiveRouter(null);
   }, [api]);
+
+  useDeepLinks(api);
 
   const switchTab = useCallback(
     (href: string) => {

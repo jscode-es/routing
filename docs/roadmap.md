@@ -157,15 +157,20 @@ Notas técnicas que quedaron resueltas aquí:
   apilar en el exterior. Limitación deliberada: un navegador anidado debe
   colgar de un hijo directo con `_layout`.
 
-## Fase 7 — Deep linking ⏳
+## Fase 7 — Deep linking ✅ (iOS pendiente)
 
-- [ ] TDD: `linking.test.ts` mockeando `Linking` de RN (`getInitialURL`,
+- [x] TDD: `linking.test.ts` mockeando `Linking` de RN (`getInitialURL`,
       `addEventListener('url')`, resolución reutilizando `match.ts`)
-- [ ] `example/`: intent-filter `routingexample://` en `AndroidManifest.xml`
+- [x] `example/`: intent-filter `routingexample://` en `AndroidManifest.xml`
       (+ `Info.plist` preparado para iOS), pantalla `app/share/[id].tsx`
-- [ ] **Checklist manual Android** (frío y caliente):
+- [x] **Checklist manual Android** (frío y caliente):
       `adb shell am start -W -a android.intent.action.VIEW -d "routingexample://share/42" es.jscode.routingexample`
 - [ ] **Checklist iOS (pendiente de Mac)**: `xcrun simctl openurl booted routingexample://share/42`
+
+Notas: `urlToPath` trata el "host" del esquema propio como primer segmento
+(`routingexample://share/42` → `/share/42`); `getInitialURL` hace `replace`
+(sin historial en frío) y los eventos `url` hacen `push`; una URL sin match
+cae en `+not-found`.
 
 ## Fase 8 — Pulido y empaquetado npm ⏳
 
@@ -190,5 +195,5 @@ Notas técnicas que quedaron resueltas aquí:
 | Swipe-to-go-back iOS y su cancelación | A mano en iOS | Pendiente de Mac |
 | Congelado real de pantallas tapadas | Contador de renders + profiler nativo | Fase 4/5 |
 | Estado de pestañas al cambiar de tab | `TextInput` sin resetear | ✅ Fase 5 |
-| Deep link desde fuera de la app (frío/caliente) | `adb` / `xcrun simctl` | Fase 7 |
+| Deep link desde fuera de la app (frío/caliente) | `adb` / `xcrun simctl` | ✅ Fase 7 (Android) |
 | Fast Refresh reevaluando `require.context` | Editar con la app corriendo | ✅ Fase 2 |
