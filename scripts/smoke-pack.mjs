@@ -45,6 +45,11 @@ try {
   assert.equal(config.transformer.unstable_allowRequireContext, true);
   assert.equal(config.transformer.keepMe, true);
 
+  // Plugin de babel: JS plano, ejecutable en Node.
+  const routingBabel = require('@jscode/react-native-routing/babel');
+  const plugin = routingBabel({ types: {} });
+  assert.equal(typeof plugin.visitor.FunctionDeclaration, 'function');
+
   console.log('smoke-pack: OK');
 } finally {
   rmSync(workDir, { recursive: true, force: true });

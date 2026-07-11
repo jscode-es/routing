@@ -6,6 +6,24 @@
 
 ## Componentes
 
+### `<RootRouter>`
+
+Componente de entrada: monta el árbol de rutas y el
+`GestureHandlerRootView`. Sin props, usa el `require.context` que inyecta
+el plugin de Babel del paquete (ver
+[getting-started.md](./getting-started.md#2-configurar-babel)):
+
+```tsx
+export default function App() {
+  return <RootRouter />;
+}
+```
+
+| Prop | Descripción |
+| --- | --- |
+| `context` | Opcional: un `require.context` propio, como alternativa al plugin de Babel. Sin plugin y sin `context`, lanza un error explicando ambas opciones. |
+| `initialPath` | Ruta inicial (por defecto `/`). |
+
 ### `<Stack>` / `<Stack.Screen>`
 
 Navegador de pila propio (no es `@react-navigation/native-stack`), pero

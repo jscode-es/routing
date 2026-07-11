@@ -189,6 +189,30 @@ cae en `not-found`.
 - [ ] **Antes del release 1.0**: completar todos los checklist iOS en un Mac
       (`pod install`, swipe back, modales, deep links)
 
+## Fase 9 — Zero-config: `<RootRouter />` sin prop `context` ✅
+
+- [x] TDD: `babel/plugin.test.ts` (vitest), `app-context.test.ts`,
+      fallback y error claro en `RootRouter.test.tsx`
+- [x] Plugin de Babel `@jscode/react-native-routing/babel` (JS plano, como
+      el helper de Metro): inyecta `require.context` en el placeholder
+      `getAppContext()` de `src/route-tree/app-context.ts`, con path
+      relativo calculado desde ese módulo hasta el directorio de rutas
+      (opción `root`, default `./app`)
+- [x] `RootRouter`: prop `context` opcional (se mantiene como escape
+      hatch); sin plugin y sin prop → error con las dos alternativas
+- [x] `example/`: `<RootRouter />` sin props + plugin en `babel.config.js`
+      (antes de `react-native-worklets/plugin`, que debe ser el último)
+- [x] **Checklist manual Android**: app arranca con `<RootRouter />`,
+      navegación y deep link intactos (Metro con `--reset-cache` tras
+      tocar `babel.config.js`)
+- [ ] **Checklist iOS (pendiente de Mac)**
+
+Notas: el placeholder devuelve `null` en vez de contener un
+`require.context(process.env.X)` directo para que un consumidor sin el
+plugin no rompa el build de Metro (un `require.context` con argumento
+no-literal es error de build); sin plugin el fallo es un error de runtime
+claro al montar `RootRouter`.
+
 ---
 
 ## Lo que no cubre el TDD automatizado (verificación manual)

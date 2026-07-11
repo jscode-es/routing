@@ -31,18 +31,29 @@ paquete una vez publicado.)
 
 ## 2. Configurar Babel
 
-`react-native-reanimated` v4 requiere el plugin de Babel de
-`react-native-worklets`, **último** en la lista de plugins:
+Dos plugins: el del paquete (hace que `RootRouter` encuentre solo el
+directorio `app/`, sin pasarle nada) y el de `react-native-worklets`, que
+`react-native-reanimated` v4 exige **último** en la lista:
 
 ```js
 // babel.config.js
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
   plugins: [
-    // ...otros plugins
+    '@jscode/react-native-routing/babel',
     'react-native-worklets/plugin', // siempre el último
   ],
 };
+```
+
+Por defecto las rutas se leen de `./app` (relativo a la raíz del
+proyecto); para otro directorio, pasa la opción `root`:
+
+```js
+plugins: [
+  ['@jscode/react-native-routing/babel', { root: './src/routes' }],
+  'react-native-worklets/plugin',
+],
 ```
 
 ## 3. Configurar Metro
@@ -56,8 +67,8 @@ module.exports = withRouting(getDefaultConfig(__dirname));
 ```
 
 `withRouting` activa `transformer.unstable_allowRequireContext`, necesario
-para que la app pueda enumerar el directorio `app/` con `require.context`
-(paso 5).
+para que el `require.context` que inyecta el plugin de Babel del paso 2
+pueda enumerar el directorio `app/`.
 
 ## 4. Punto de entrada
 
@@ -76,18 +87,22 @@ AppRegistry.registerComponent(appName, () => App);
 
 ## 5. Montar el router raíz
 
-La app es quien llama a `require.context` sobre su propio directorio
-`app/` (tiene que ser un string literal, Metro lo resuelve en build-time —
-por eso no puede hacerlo el paquete desde `node_modules`) y se lo pasa a
-`RootRouter`:
-
 ```tsx
 // App.tsx
 import { RootRouter } from '@jscode/react-native-routing';
 
 export default function App() {
-  return <RootRouter context={require.context('./app', true, /\.[jt]sx?$/)} />;
+  return <RootRouter />;
 }
+```
+
+Con el plugin de Babel del paso 2 no hay que pasarle nada: el plugin
+inyecta en build-time el `require.context` que enumera `app/`. Si
+prefieres no usar el plugin, el prop `context` sigue disponible como
+alternativa explícita:
+
+```tsx
+<RootRouter context={require.context('./app', true, /\.[jt]sx?$/)} />
 ```
 
 `RootRouter` ya envuelve internamente el `GestureHandlerRootView` que

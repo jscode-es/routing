@@ -47,10 +47,13 @@ const { getDefaultConfig } = require('@react-native/metro-config');
 const { withRouting } = require('@jscode/react-native-routing/metro');
 module.exports = withRouting(getDefaultConfig(__dirname));
 
+// babel.config.js → plugins
+// '@jscode/react-native-routing/babel'  (acepta { root: './otro-dir' })
+
 // App.tsx
 import { RootRouter } from '@jscode/react-native-routing';
 export default function App() {
-  return <RootRouter context={require.context('./app', true, /\.[jt]sx?$/)} />;
+  return <RootRouter />;
 }
 ```
 

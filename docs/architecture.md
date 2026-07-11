@@ -51,14 +51,28 @@ module.exports = withRouting(getDefaultConfig(__dirname));
 
 `withRouting` activa `transformer.unstable_allowRequireContext = true`.
 
-La llamada a `require.context` la hace la **app consumidora** (no el
-paquete): Metro exige que el path sea un string literal resoluble en
-build-time relativo al módulo que lo contiene, y el código del paquete vive
-en `node_modules`, desde donde no puede apuntar al `app/` del proyecto. Por
-eso `RootRouter` recibe el contexto ya evaluado como prop:
+Metro exige que el path de `require.context` sea un string literal
+resoluble en build-time relativo al módulo que lo contiene, y el código
+del paquete vive en `node_modules`, desde donde no conoce a priori el
+`app/` del proyecto. El paquete lo resuelve con un plugin de Babel propio
+(`@jscode/react-native-routing/babel`, mismo enfoque que Expo Router): el
+módulo `src/route-tree/app-context.ts` contiene un placeholder
+(`getAppContext()` devuelve `null`) y el plugin lo reemplaza en
+build-time por un `require.context` con el path relativo calculado desde
+ese módulo hasta el directorio de rutas (opción `root`, por defecto
+`./app`). Así basta con:
 
 ```tsx
 // App.tsx de la app consumidora
+<RootRouter />
+```
+
+Sin el plugin configurado, `getAppContext()` sigue devolviendo `null`
+(nunca llega a Metro un `require.context` no-literal, que sería error de
+build) y `RootRouter` lanza un error claro salvo que reciba el contexto
+como prop, que se mantiene como alternativa explícita:
+
+```tsx
 <RootRouter context={require.context('./app', true, /\.[jt]sx?$/)} />
 ```
 

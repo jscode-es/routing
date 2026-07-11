@@ -22,6 +22,20 @@ describe('parse', () => {
     expect(tree.children).toHaveLength(0);
   });
 
+  it('ignores non-route files without resolving them', () => {
+    const resolved: string[] = [];
+    const tree = parse(
+      ['./index.tsx', './logo.png', './data.json', './notes.md'],
+      (key) => {
+        resolved.push(key);
+        return key;
+      },
+    );
+    expect(tree.component).toBe('./index.tsx');
+    expect(tree.children).toHaveLength(0);
+    expect(resolved).toEqual(['./index.tsx']);
+  });
+
   it('maps a top-level file to a static child route', () => {
     const tree = parse(['./settings.tsx'], resolve);
     const settings = child(tree, 'settings');
