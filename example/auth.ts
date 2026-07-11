@@ -16,3 +16,14 @@ export function setSession(value: boolean): void {
   loggedIn = value;
   listeners.forEach((listener) => listener());
 }
+
+let premium = false;
+
+export function usePremium(): boolean {
+  return useSyncExternalStore(subscribe, () => premium);
+}
+
+export function setPremium(value: boolean): void {
+  premium = value;
+  listeners.forEach((listener) => listener());
+}
