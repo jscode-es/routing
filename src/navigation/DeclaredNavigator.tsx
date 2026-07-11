@@ -14,6 +14,7 @@ export function DeclaredNavigator({
         animation={config.animation}
         showLabel={config.showLabel}
         order={config.order}
+        hidden={config.hidden}
       />
     );
   }

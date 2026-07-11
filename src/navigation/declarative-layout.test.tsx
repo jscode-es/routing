@@ -164,6 +164,30 @@ describe('declarative navigator (layout.ts)', () => {
     expect(names).toEqual(['tab-settings', 'tab-index', 'tab-profile']);
   });
 
+  it('hides tabs listed in the navigator hidden config, keeping the route navigable', async () => {
+    const ctx = fakeContext({
+      './(tabs)/layout.ts': {
+        navigator: { type: 'tabs', hidden: ['secret'] },
+      },
+      './(tabs)/home.tsx': { default: Home },
+      './(tabs)/profile.tsx': { default: () => <Text>P</Text> },
+      './(tabs)/secret.tsx': { default: () => <Text>Secret screen</Text> },
+    });
+    await render(<RootRouter context={ctx} initialPath="/home" />);
+    expect(screen.getByTestId('tab-home')).toBeTruthy();
+    expect(screen.getByTestId('tab-profile')).toBeTruthy();
+    expect(screen.queryByTestId('tab-secret')).toBeNull();
+
+    await act(async () => {
+      router.push('/secret');
+    });
+    // La ruta oculta sigue siendo navegable y renderiza su contenido,
+    // sin aparecer en la barra ni mover el indicador.
+    expect(screen.getByText('Secret screen')).toBeTruthy();
+    expect(screen.queryByTestId('tab-secret')).toBeNull();
+    expect(screen.queryByTestId('tab-indicator')).toBeNull();
+  });
+
   it('warns and falls back to pass-through on a malformed navigator export', async () => {
     const ctx = fakeContext({
       './layout.tsx': { default: () => <Stack /> },

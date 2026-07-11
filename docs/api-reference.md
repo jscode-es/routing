@@ -116,6 +116,7 @@ export const navigator: NavigatorConfig = {
   animation: 'fade', // solo tabs
   showLabel: true,   // solo tabs
   order: ['home', 'search', 'profile'], // solo tabs, opcional
+  hidden: ['secret'],                   // solo tabs, opcional
 };
 ```
 
@@ -123,6 +124,21 @@ Sin `order`, las pestañas salen con `index` primero y el resto en el
 orden de descubrimiento de archivos (alfabético). Con `order`, los
 nombres listados van primero en ese orden y los no listados detrás, en su
 orden natural.
+
+`hidden` saca pestañas de la barra sin quitar sus rutas: siguen siendo
+navegables (push, deep link) y, si una está activa, su pantalla se
+renderiza igual — la expulsión, si procede, es cosa de un guard
+`<Redirect>` en la página. Para visibilidad **dinámica** (p. ej. una
+pestaña solo para usuarios premium), usa la prop `hidden` de `<Tabs>`
+desde un layout con componente, que re-renderiza con tu estado:
+
+```tsx
+// app/(tabs)/layout.tsx
+export default function TabsLayout() {
+  const { isPremium } = useSession();
+  return <Tabs hidden={isPremium ? ['upgrade'] : ['premium']} />;
+}
+```
 
 Sin archivo de layout, la raíz monta un `<Stack>` implícito siempre, y
 cualquier carpeta con más de una entrada navegable también; `'slot'`
@@ -233,9 +249,11 @@ paquete no bundlea ningún set de iconos, pasa el tuyo (un `Image`, un SVG,
 
 Props de `<Tabs>`: `animation` (`'none'` por defecto, `'fade'` funde el
 contenido al cambiar de pestaña con reanimated), `showLabel` (`false`
-para modo solo-iconos) y `order` (orden de las pestañas por nombre de
-ruta; las no listadas van detrás en su orden natural — mismo
-comportamiento que el `order` de `NavigatorConfig`).
+para modo solo-iconos), `order` (orden de las pestañas por nombre de
+ruta; las no listadas van detrás en su orden natural) y `hidden`
+(pestañas fuera de la barra con rutas aún navegables; ideal para
+visibilidad dinámica calculada en el layout) — `order` y `hidden` tienen
+el mismo comportamiento que sus equivalentes de `NavigatorConfig`.
 
 ### `<Slot>`
 

@@ -88,11 +88,13 @@ function TabsComponent({
   animation = 'none',
   showLabel = true,
   order,
+  hidden,
 }: {
   children?: ReactNode;
   animation?: 'none' | 'fade';
   showLabel?: boolean;
   order?: string[];
+  hidden?: string[];
 }): React.JSX.Element {
   const { tree, activeEntry } = useRouterState();
   useNavigatorMountGuard();
@@ -105,12 +107,21 @@ function TabsComponent({
   const { chain } = referenceEntry.match;
   const layoutNode = chain[layoutDepth] ?? tree;
 
-  const tabs = resolveTabs(layoutNode, children, order);
+  const allTabs = resolveTabs(layoutNode, children, order);
+  const tabs =
+    hidden !== undefined && hidden.length > 0
+      ? allTabs.filter((tab) => !hidden.includes(tab.name))
+      : allTabs;
   const activeName = screenNameForEntry(referenceEntry, layoutDepth);
-  const activeIndex = Math.max(
-    0,
-    tabs.findIndex((tab) => tab.name === activeName),
-  );
+  // -1: la ruta activa es una pestaña oculta — su pantalla se renderiza
+  // igual (la expulsión, si procede, es cosa de un guard <Redirect>), pero
+  // la barra no la muestra ni pinta indicador.
+  const activeIndex = tabs.findIndex((tab) => tab.name === activeName);
+  const indicatorIndex = Math.max(0, activeIndex);
+  const contentTabs =
+    activeIndex === -1
+      ? [...tabs, { name: activeName, options: {} }]
+      : tabs;
 
   // Última entry vista por pestaña: las pestañas en background mantienen su
   // subárbol montado (y sus params) mientras otra está en primer plano.
@@ -132,10 +143,10 @@ function TabsComponent({
   }
 
   const [barWidth, setBarWidth] = useState(0);
-  const progress = useSharedValue(activeIndex);
+  const progress = useSharedValue(indicatorIndex);
   useEffect(() => {
-    progress.value = withTiming(activeIndex, { duration: 200 });
-  }, [activeIndex, progress]);
+    progress.value = withTiming(indicatorIndex, { duration: 200 });
+  }, [indicatorIndex, progress]);
   const itemWidth = tabs.length > 0 ? barWidth / tabs.length : 0;
   const indicatorStyle = useAnimatedStyle(
     () => ({
@@ -148,7 +159,7 @@ function TabsComponent({
   return (
     <View style={styles.root}>
       <ScreenContainer style={styles.container}>
-        {tabs.map((tab) => {
+        {contentTabs.map((tab) => {
           const entry = entries[tab.name];
           if (!entry) return null;
           const active = tab.name === activeName;
@@ -176,10 +187,12 @@ function TabsComponent({
           style={styles.bar}
           onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
         >
-          <Animated.View
-            testID="tab-indicator"
-            style={[styles.indicator, indicatorStyle]}
-          />
+          {activeIndex >= 0 && (
+            <Animated.View
+              testID="tab-indicator"
+              style={[styles.indicator, indicatorStyle]}
+            />
+          )}
           {tabs.map((tab) => {
             const active = tab.name === activeName;
             return (

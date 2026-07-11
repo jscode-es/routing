@@ -10,6 +10,8 @@ export interface NavigatorConfig {
   // Orden de las pestañas por nombre de ruta; las no listadas van detrás
   // en su orden natural (index primero, resto por descubrimiento).
   order?: string[];
+  // Pestañas fuera de la barra; sus rutas siguen siendo navegables.
+  hidden?: string[];
 }
 
 const NAVIGATOR_TYPES: readonly string[] = ['stack', 'tabs', 'slot'];

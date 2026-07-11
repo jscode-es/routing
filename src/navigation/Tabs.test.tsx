@@ -82,6 +82,33 @@ describe('Tabs', () => {
     expect(screen.getByText('Count 2')).toBeTruthy();
   });
 
+  it('toggles tab visibility dynamically with the hidden prop', async () => {
+    const Layout = () => {
+      const [premium, setPremium] = useState(false);
+      return (
+        <>
+          <Pressable testID="toggle" onPress={() => setPremium((p) => !p)}>
+            <Text>toggle</Text>
+          </Pressable>
+          <Tabs hidden={premium ? ['upgrade'] : ['premium']} />
+        </>
+      );
+    };
+    const ctx = fakeContext({
+      './(tabs)/layout.tsx': Layout,
+      './(tabs)/home.tsx': Home,
+      './(tabs)/premium.tsx': () => <Text>Premium screen</Text>,
+      './(tabs)/upgrade.tsx': () => <Text>Upgrade screen</Text>,
+    });
+    await render(<RootRouter context={ctx} initialPath="/home" />);
+    expect(screen.getByTestId('tab-upgrade')).toBeTruthy();
+    expect(screen.queryByTestId('tab-premium')).toBeNull();
+
+    await fireEvent.press(screen.getByTestId('toggle'));
+    expect(screen.getByTestId('tab-premium')).toBeTruthy();
+    expect(screen.queryByTestId('tab-upgrade')).toBeNull();
+  });
+
   it('renders the animated indicator', async () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
     expect(screen.getByTestId('tab-indicator')).toBeTruthy();
