@@ -18,7 +18,7 @@ Resueltas el 2026-07-11, registradas en la sección
 - [x] Versionado: el stack implícito entra **antes del release 1.0**
       (paquete en 0.x, sin major)
 
-## Paso 1 — `metadata` / `generateMetadata` por página ✅ (emulador pendiente)
+## Paso 1 — `metadata` / `generateMetadata` por página ✅
 
 Tipos y lectura (capa `src/navigation/`, nunca `src/route-tree/` — la
 regla ESLint de no importar React ahí sigue aplicando):
@@ -52,8 +52,12 @@ Cierre del paso:
 - [x] `example/`: migradas las opciones de `modal` y `users/[id]` (stack,
       con `generateMetadata` dinámico) y de las tres pestañas (el layout
       de tabs queda sin `Tabs.Screen`)
-- [ ] **Checklist manual Android (pendiente)**: headers, iconos de tab,
-      modal OTT landscape y título dinámico de `/users/42` en emulador
+- [x] **Checklist manual Android**: iconos/etiquetas de tab con opacidad
+      por foco, header "Ajustes" desde el metadata del index del
+      sub-stack, título dinámico "Usuario 42" vía generateMetadata y
+      modal OTT (landscape, sin header/safe area, fondo negro) — todo
+      verificado en emulador
+- [ ] **Checklist iOS (pendiente de Mac)**
 - [x] `npm run typecheck && npm run lint && npm run test`
 
 Nota de implementación: la metadata de página no se aplica al `Screen`
