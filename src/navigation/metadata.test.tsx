@@ -197,6 +197,25 @@ describe('metadata in Stack', () => {
     );
   });
 
+  it('applies the not-found metadata to its screen', async () => {
+    const ctx = fakeContext({
+      './index.tsx': { default: Home },
+      './not-found.tsx': {
+        default: () => <Text>Nada</Text>,
+        metadata: { title: 'No encontrado', animation: 'none' },
+      },
+    });
+    await render(<RootRouter context={ctx} />);
+    await act(async () => {
+      router.push('/nope');
+    });
+    const headers = screen.getAllByTestId('header-config');
+    expect(headers[1]?.props.title).toBe('No encontrado');
+    expect(screen.getAllByTestId('screen')[1]?.props.stackAnimation).toBe(
+      'none',
+    );
+  });
+
   it('warns and ignores a non-function generateMetadata export', async () => {
     const ctx = fakeContext({
       './layout.tsx': { default: StackLayout },

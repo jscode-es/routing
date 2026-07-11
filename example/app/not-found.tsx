@@ -1,6 +1,12 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from '@jscode/react-native-routing';
+import type { ScreenMetadata } from '@jscode/react-native-routing';
+
+export const metadata: ScreenMetadata = {
+  title: 'No encontrado',
+  animation: 'none',
+};
 
 export default function NotFound() {
   const router = useRouter();

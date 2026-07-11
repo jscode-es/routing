@@ -141,22 +141,28 @@ app/                          Stack (implícito)
       ≥0.77 ya no muestra los console.log del cliente en su terminal —
       se ven en logcat y en React Native DevTools
 
-## Paso 4 — Stack implícito por defecto (breaking change)
+## Paso 4 — Stack implícito por defecto (breaking change) ✅
 
-- [ ] Tests jest: carpeta sin layout → `<Stack>` implícito (hoy: paso
-      directo); la raíz `app/` funciona sin `layout.tsx`
-- [ ] Regla de carpetas que no crean navegador: una carpeta con una única
+- [x] Tests jest (`implicit-stack.test.tsx`): la raíz funciona sin ningún
+      archivo de layout; una carpeta con varias rutas obtiene su propio
+      stack implícito (el push agrupa dentro)
+- [x] Regla de carpetas que no crean navegador: una carpeta con una única
       ruta hoja queda como pantalla del stack ancestro
-- [ ] Revisar interacción con navegadores anidados (la regla actual del
-      hijo directo) y con deep linking (`linking.ts` no debería cambiar,
-      confirmarlo con sus tests)
-- [ ] `example/`: eliminar el `layout.tsx` raíz y verificar checklist
-      manual completo Android (push/pop, back físico, tabs, deep link
-      con `adb`, Fast Refresh)
-- [ ] Documentar la migración (quién quiera el comportamiento antiguo:
-      `navigator: { type: 'slot' }`); entra en 0.x antes del release 1.0,
-      sin bump major
-- [ ] `npm run smoke` (el tarball publica los tipos nuevos)
+      (`src/route-tree/implicit.ts`, compartido con el formateador)
+- [x] Navegadores anidados y deep linking intactos (suites completas en
+      verde; los tests de Tabs se actualizaron al nuevo contrato: la
+      pantalla exterior del grupo existe y su header va oculto por
+      defecto cuando el hijo tiene navegador propio)
+- [x] Extra: `not-found.tsx` también acepta `metadata` (se copia a la
+      hoja virtual de `matchNotFound`)
+- [x] `example/`: eliminado el `layout.tsx` raíz — la app entera corre
+      sin componentes de layout; verificado en emulador (tabs, login sin
+      header desde metadata, not-found con título propio, árbol logueado
+      con `Stack (implícito)`)
+- [x] Migración documentada en los docs del Paso 5; entra en 0.x antes
+      del release 1.0, sin bump major
+- [x] `npm run smoke`
+- [ ] **Checklist iOS (pendiente de Mac)**
 
 ## Paso 5 — Documentación y cierre
 

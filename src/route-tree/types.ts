@@ -13,6 +13,9 @@ export interface RouteNode<C = unknown> {
   metadata?: unknown;
   generateMetadata?: unknown;
   navigator?: unknown;
+  // metadata del not-found de la carpeta: el archivo no es un nodo del
+  // árbol, matchNotFound la copia en la hoja virtual que fabrica.
+  notFoundMetadata?: unknown;
   children: RouteNode<C>[];
 }
 

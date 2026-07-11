@@ -121,7 +121,11 @@ function StackComponent({
         const meta =
           !nestedNavigator && leaf ? entryMetadata(leaf, entry) : {};
         const options = { ...meta, ...configs[name] };
-        const headerShown = options.headerShown !== false;
+        // La pantalla de un navegador anidado no muestra header por defecto:
+        // el navegador interior gestiona los suyos.
+        const headerShown = nestedNavigator
+          ? options.headerShown === true
+          : options.headerShown !== false;
         const wantsSafeArea =
           !headerShown && options.safeArea !== false && !topInsetHandled;
         const content = (

@@ -42,8 +42,9 @@ describe('Tabs', () => {
   it('mounts every tab in its own Screen, active one in foreground', async () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
     const screens = screen.getAllByTestId('screen');
-    expect(screens).toHaveLength(2);
-    expect(screens.map((s) => s.props.activityState)).toEqual([2, 0]);
+    // La primera pantalla es la del grupo (tabs) en el stack raíz implícito.
+    expect(screens).toHaveLength(3);
+    expect(screens.map((s) => s.props.activityState)).toEqual([2, 2, 0]);
     expect(screen.getByText('Count 0')).toBeTruthy();
     expect(screen.getByText('Profile screen')).toBeTruthy();
   });
@@ -67,7 +68,7 @@ describe('Tabs', () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
     await fireEvent.press(screen.getByTestId('tab-profile'));
     const screens = screen.getAllByTestId('screen');
-    expect(screens.map((s) => s.props.activityState)).toEqual([0, 2]);
+    expect(screens.map((s) => s.props.activityState)).toEqual([2, 0, 2]);
   });
 
   it('keeps local tab state when switching back and forth', async () => {
@@ -88,8 +89,12 @@ describe('Tabs', () => {
 
   it('wraps the tab bar in a bottom safe area', async () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
-    const safeArea = screen.getByTestId('safe-area');
-    expect(safeArea.props.edges).toEqual({ bottom: true });
+    const safeAreas = screen.getAllByTestId('safe-area');
+    // La superior la aplica la pantalla sin header del stack raíz implícito.
+    expect(safeAreas.map((s) => s.props.edges)).toEqual([
+      { top: true },
+      { bottom: true },
+    ]);
     expect(screen.getByTestId('tab-home')).toBeTruthy();
   });
 

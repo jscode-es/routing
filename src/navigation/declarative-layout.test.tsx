@@ -51,7 +51,8 @@ describe('declarative navigator (layout.ts)', () => {
       },
     });
     await render(<RootRouter context={ctx} initialPath="/home" />);
-    expect(screen.getAllByTestId('screen')).toHaveLength(2);
+    // 3 = pantalla del grupo en el stack raíz implícito + una por pestaña.
+    expect(screen.getAllByTestId('screen')).toHaveLength(3);
     expect(screen.getAllByTestId('tab-fade').length).toBeGreaterThan(0);
     expect(screen.getByTestId('icon-home')).toBeTruthy();
     expect(screen.getByTestId('icon-profile')).toBeTruthy();

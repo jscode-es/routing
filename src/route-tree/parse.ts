@@ -100,6 +100,8 @@ export function parse<C>(
       if (navigator !== undefined) node.navigator = navigator;
     } else if (fileName === 'not-found') {
       node.notFound = requireComponent(key, resolve(key));
+      const meta = resolveMeta?.(key);
+      if (meta?.metadata !== undefined) node.notFoundMetadata = meta.metadata;
     } else if (fileName === 'index') {
       if (node.component !== undefined) {
         throw new Error(

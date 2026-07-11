@@ -1,3 +1,4 @@
+import { hasImplicitStack } from '../route-tree/implicit';
 import type { RouteNode } from '../route-tree/types';
 import { warnDev } from './dev';
 
@@ -34,9 +35,11 @@ export function readNavigatorConfig(
 }
 
 // Un hijo con navegador propio agrupa sus entradas en una sola pantalla del
-// stack exterior (mismo criterio que un layout manual); slot no crea nivel.
+// stack exterior: layout manual, config declarativa (slot no crea nivel) o
+// stack implícito de carpeta con varias rutas.
 export function createsNavigator(node: RouteNode): boolean {
   if (node.layout !== undefined) return true;
   const config = readNavigatorConfig(node);
-  return config !== undefined && config.type !== 'slot';
+  if (config !== undefined) return config.type !== 'slot';
+  return hasImplicitStack(node);
 }

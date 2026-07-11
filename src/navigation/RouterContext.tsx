@@ -5,6 +5,7 @@ import React, {
   useState,
 } from 'react';
 import type { ComponentType, ReactNode } from 'react';
+import { hasImplicitStack } from '../route-tree/implicit';
 import type { RouteNode } from '../route-tree/types';
 import { DeclaredNavigator } from './DeclaredNavigator';
 import { warnDev } from './dev';
@@ -103,17 +104,18 @@ export function RouteLevel({
     <RouteLevel chain={chain} index={index + 1} />
   );
 
-  // El contenido del nivel es el navegador declarado en layout.ts (slot y
-  // ausencia de config son el paso directo). Un layout con componente lo
-  // recibe como children (contrato estilo Next.js); SlotContext se mantiene
-  // con el subárbol directo por compatibilidad con <Slot>.
+  // El contenido del nivel es el navegador de la carpeta: el declarado en
+  // layout.ts, o el Stack implícito (raíz siempre; carpetas, con más de una
+  // entrada); slot es el paso directo. Un layout con componente lo recibe
+  // como children (contrato estilo Next.js); SlotContext se mantiene con el
+  // subárbol directo por compatibilidad con <Slot>.
   const config = readNavigatorConfig(node);
-  const content =
-    config && config.type !== 'slot' ? (
-      <DeclaredNavigator config={config} />
-    ) : (
-      inner
-    );
+  let content = inner;
+  if (config) {
+    if (config.type !== 'slot') content = <DeclaredNavigator config={config} />;
+  } else if (hasImplicitStack(node, index === 0)) {
+    content = <DeclaredNavigator config={{ type: 'stack' }} />;
+  }
 
   let body = content;
   if (node.layout) {

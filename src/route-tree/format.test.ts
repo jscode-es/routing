@@ -69,6 +69,27 @@ describe('formatRouteTree', () => {
     expect(output).toMatch(/not-found\s+404 \(default del paquete\)/);
   });
 
+  it('labels implicit stacks', () => {
+    const tree = parse(
+      ['./index.tsx', './sec/index.tsx', './sec/details.tsx'],
+      resolve,
+      () => ({}),
+    );
+    const output = formatRouteTree(tree);
+    expect(output).toMatch(/app\/\s+Stack \(implícito\)/);
+    expect(output).toMatch(/sec\/\s+Stack \(implícito\)/);
+  });
+
+  it('does not label single-leaf folders as implicit stacks', () => {
+    const tree = parse(
+      ['./index.tsx', './users/[id].tsx', './extra.tsx'],
+      resolve,
+      () => ({}),
+    );
+    const output = formatRouteTree(tree);
+    expect(output).not.toMatch(/users\/\s+Stack/);
+  });
+
   it('draws the tree with box-drawing branches', () => {
     const output = formatRouteTree(demoTree());
     expect(output).toContain('├── (tabs)/');

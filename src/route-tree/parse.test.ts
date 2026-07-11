@@ -164,6 +164,14 @@ describe('metadata exports', () => {
     expect(sec.generateMetadata).toBeUndefined();
   });
 
+  it('captures the not-found metadata aside for the virtual leaf', () => {
+    const tree = parse(['./not-found.tsx', './index.tsx'], resolve, (key) =>
+      key === './not-found.tsx' ? { metadata: { title: '404' } } : {},
+    );
+    expect(tree.notFoundMetadata).toEqual({ title: '404' });
+    expect(tree.metadata).toBeUndefined();
+  });
+
   it('leaves nodes bare when the module exports no metadata', () => {
     const tree = parse(['./index.tsx'], resolve, () => ({}));
     expect(tree.metadata).toBeUndefined();

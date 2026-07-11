@@ -1,3 +1,4 @@
+import { hasImplicitStack } from './implicit';
 import type { RouteNode } from './types';
 
 interface Row {
@@ -14,7 +15,7 @@ function isFolder(node: RouteNode): boolean {
   );
 }
 
-function navigatorLabel(node: RouteNode): string {
+function navigatorLabel(node: RouteNode, isRoot = false): string {
   const type =
     typeof node.navigator === 'object' && node.navigator !== null
       ? (node.navigator as { type?: unknown }).type
@@ -23,6 +24,7 @@ function navigatorLabel(node: RouteNode): string {
   if (type === 'stack') return 'Stack';
   if (type === 'slot') return 'Slot';
   if (node.layout !== undefined) return 'layout manual';
+  if (hasImplicitStack(node, isRoot)) return 'Stack (implícito)';
   return '';
 }
 
@@ -111,7 +113,7 @@ export function formatRouteTree(tree: RouteNode): string {
     });
   };
 
-  rows.push({ tree: 'app/', info: navigatorLabel(tree), note: '' });
+  rows.push({ tree: 'app/', info: navigatorLabel(tree, true), note: '' });
   walk(tree, '', []);
 
   const treeWidth = Math.max(...rows.map((row) => row.tree.length));
