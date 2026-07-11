@@ -40,9 +40,28 @@ function childFolder<C>(node: RouteNode<C>, segment: string): RouteNode<C> {
   return found;
 }
 
+export interface RouteModuleMeta {
+  metadata?: unknown;
+  generateMetadata?: unknown;
+}
+
+function attachMeta<C>(
+  node: RouteNode<C>,
+  key: string,
+  resolveMeta?: (key: string) => RouteModuleMeta,
+): void {
+  if (!resolveMeta) return;
+  const meta = resolveMeta(key);
+  if (meta.metadata !== undefined) node.metadata = meta.metadata;
+  if (meta.generateMetadata !== undefined) {
+    node.generateMetadata = meta.generateMetadata;
+  }
+}
+
 export function parse<C>(
   keys: readonly string[],
   resolve: (key: string) => C,
+  resolveMeta?: (key: string) => RouteModuleMeta,
 ): RouteNode<C> {
   const root = makeNode<C>('');
 
@@ -69,6 +88,7 @@ export function parse<C>(
         );
       }
       node.component = resolve(key);
+      attachMeta(node, key, resolveMeta);
     } else {
       const leaf = childFolder(node, fileName);
       if (leaf.component !== undefined) {
@@ -77,6 +97,7 @@ export function parse<C>(
         );
       }
       leaf.component = resolve(key);
+      attachMeta(leaf, key, resolveMeta);
     }
   }
 

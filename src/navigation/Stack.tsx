@@ -17,6 +17,7 @@ import {
   useRouterState,
 } from './RouterContext';
 import { useRouter } from './hooks';
+import { entryMetadata } from './metadata';
 import type { NavigationEntry } from './reducer';
 import {
   collectScreenConfigs,
@@ -107,7 +108,14 @@ function StackComponent({
       {groups.map((group, index) => {
         const entry = group.entries[group.entries.length - 1]!;
         const name = screenNameForEntry(entry, layoutDepth);
-        const options = configs[name] ?? {};
+        // La metadata de la página aplica cuando este stack presenta la hoja
+        // directamente; con un layout anidado el grupo comparte Screen y las
+        // opciones del interior no se filtran al Screen exterior.
+        const leaf = entry.match.chain[entry.match.chain.length - 1];
+        const nestedLayout =
+          group.child !== undefined && group.child.layout !== undefined;
+        const meta = !nestedLayout && leaf ? entryMetadata(leaf, entry) : {};
+        const options = { ...meta, ...configs[name] };
         const headerShown = options.headerShown !== false;
         const wantsSafeArea =
           !headerShown && options.safeArea !== false && !topInsetHandled;

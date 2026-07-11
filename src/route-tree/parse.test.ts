@@ -137,6 +137,42 @@ describe('parse', () => {
   });
 });
 
+describe('metadata exports', () => {
+  const gen = () => ({});
+
+  it('captures metadata and generateMetadata on page nodes', () => {
+    const tree = parse(['./index.tsx', './users/[id].tsx'], resolve, (key) => ({
+      metadata: { title: key },
+      generateMetadata: gen,
+    }));
+    expect(tree.metadata).toEqual({ title: './index.tsx' });
+    expect(tree.generateMetadata).toBe(gen);
+    const id = child(child(tree, 'users'), '[id]');
+    expect(id.metadata).toEqual({ title: './users/[id].tsx' });
+    expect(id.generateMetadata).toBe(gen);
+  });
+
+  it('does not resolve metadata for layout or not-found files', () => {
+    const asked: string[] = [];
+    const tree = parse(
+      ['./layout.tsx', './not-found.tsx', './index.tsx'],
+      resolve,
+      (key) => {
+        asked.push(key);
+        return {};
+      },
+    );
+    expect(asked).toEqual(['./index.tsx']);
+    expect(tree.metadata).toBeUndefined();
+  });
+
+  it('leaves nodes bare when the module exports no metadata', () => {
+    const tree = parse(['./index.tsx'], resolve, () => ({}));
+    expect(tree.metadata).toBeUndefined();
+    expect(tree.generateMetadata).toBeUndefined();
+  });
+});
+
 describe('deep nesting', () => {
   it('builds three levels of folders with layouts at each level', () => {
     const tree = parse(

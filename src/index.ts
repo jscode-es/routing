@@ -8,6 +8,11 @@ export type {
   StackScreenOptions,
   StackScreenProps,
 } from './navigation/stack-options';
+export type {
+  GenerateMetadata,
+  GenerateMetadataContext,
+  ScreenMetadata,
+} from './navigation/metadata';
 export { Tabs } from './navigation/Tabs';
 export type {
   TabsScreenOptions,

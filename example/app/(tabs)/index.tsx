@@ -1,6 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { Link } from '@jscode/react-native-routing';
+import type { ScreenMetadata } from '@jscode/react-native-routing';
+
+export const metadata: ScreenMetadata = {
+  title: 'Home',
+  tab: {
+    icon: ({ focused, size }) => (
+      <Text style={{ fontSize: size, opacity: focused ? 1 : 0.4 }}>🏠</Text>
+    ),
+  },
+};
 
 export default function Home() {
   return (

@@ -12,18 +12,7 @@ export default function RootLayout() {
         name="(auth)"
         options={{ title: 'Login', headerShown: false }}
       />
-      <Stack.Screen name="users" options={{ title: 'Usuario' }} />
-      <Stack.Screen
-        name="modal"
-        options={{
-          title: 'Modal',
-          presentation: 'modal',
-          headerShown: false,
-          safeArea: false,
-          orientation: 'landscape',
-          contentStyle: { backgroundColor: '#111' },
-        }}
-      />
+      {/* users y modal declaran sus opciones vía metadata en la página */}
       <Stack.Screen
         name="not-found"
         options={{ title: 'No encontrado', animation: 'none' }}

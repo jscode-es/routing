@@ -1,6 +1,18 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Link } from '@jscode/react-native-routing';
+import type { ScreenMetadata } from '@jscode/react-native-routing';
+
+// title alimenta a la vez la pestaña y el header del sub-stack; el icono
+// de la pestaña de una carpeta sale del metadata de su index.
+export const metadata: ScreenMetadata = {
+  title: 'Ajustes',
+  tab: {
+    icon: ({ focused, size }) => (
+      <Text style={{ fontSize: size, opacity: focused ? 1 : 0.4 }}>⚙️</Text>
+    ),
+  },
+};
 
 export default function Settings() {
   return (

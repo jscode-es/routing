@@ -18,38 +18,49 @@ Resueltas el 2026-07-11, registradas en la sección
 - [x] Versionado: el stack implícito entra **antes del release 1.0**
       (paquete en 0.x, sin major)
 
-## Paso 1 — `metadata` / `generateMetadata` por página
+## Paso 1 — `metadata` / `generateMetadata` por página ✅ (emulador pendiente)
 
 Tipos y lectura (capa `src/navigation/`, nunca `src/route-tree/` — la
 regla ESLint de no importar React ahí sigue aplicando):
 
-- [ ] Definir `ScreenMetadata` y `GenerateMetadata` (opciones de stack
-      planas, opciones de pestaña bajo `tab`)
-- [ ] Helper de lectura segura del módulo: export ausente → defaults sin
+- [x] Definir `ScreenMetadata` y `GenerateMetadata` (opciones de stack
+      planas, opciones de pestaña bajo `tab`) — `src/navigation/metadata.ts`
+- [x] Helper de lectura segura del módulo: export ausente → defaults sin
       warning; export malformada (no-objeto, función que lanza) →
       warning solo en desarrollo + defaults
 
-Tests jest (`src/navigation/`), antes del código:
+Tests jest (`src/navigation/metadata.test.tsx`), escritos antes del código:
 
-- [ ] Stack aplica `metadata` de la página al montarla: `title`,
+- [x] Stack aplica `metadata` de la página al montarla: `title`,
       `headerShown`, `safeArea`, `presentation`, `animation`,
       `orientation`, `contentStyle`
-- [ ] Tabs lee `title` y `tab.icon` de **todas** las rutas hermanas al
-      montar la barra (lectura eager solo en Tabs; en Stack, lazy)
-- [ ] `generateMetadata({ params })` se evalúa al resolver la entrada y
-      se mezcla sobre la `metadata` estática
-- [ ] Página sin exports navega igual que hoy (caso base, sin warning)
-- [ ] Precedencia completa: defaults < `metadata` < `generateMetadata` <
+- [x] Tabs lee `title` y `tab.icon` de **todas** las rutas hermanas al
+      montar la barra (el árbol ya ejecuta los módulos en
+      `buildRouteTree`, así que la captura es coste cero)
+- [x] `generateMetadata({ params, pathname, segments })` se evalúa al
+      resolver la entrada y se mezcla sobre la `metadata` estática
+- [x] Página sin exports navega igual que hoy (caso base, sin warning)
+- [x] Precedencia completa: defaults < `metadata` < `generateMetadata` <
       `<Stack.Screen options>`/`<Tabs.Screen options>` explícitos
-- [ ] Metadata parcial (solo `title`) completa el resto con defaults
+- [x] Metadata parcial (solo `title`) completa el resto con defaults
+- [x] Captura de exports en `parse` (vitest): nodos de página sí,
+      `layout`/`not-found` no
 
 Cierre del paso:
 
-- [ ] Exportar los tipos desde `src/index.ts`
-- [ ] `example/`: migrar las opciones de una pantalla de cada navegador a
-      `metadata` y verificar en emulador (headers, iconos de tab,
-      transiciones)
-- [ ] `npm run typecheck && npm run lint && npm run test`
+- [x] Exportar los tipos desde `src/index.ts`
+- [x] `example/`: migradas las opciones de `modal` y `users/[id]` (stack,
+      con `generateMetadata` dinámico) y de las tres pestañas (el layout
+      de tabs queda sin `Tabs.Screen`)
+- [ ] **Checklist manual Android (pendiente)**: headers, iconos de tab,
+      modal OTT landscape y título dinámico de `/users/42` en emulador
+- [x] `npm run typecheck && npm run lint && npm run test`
+
+Nota de implementación: la metadata de página no se aplica al `Screen`
+exterior cuando el grupo contiene un layout anidado (mismo criterio que
+`groupEntries`) — las opciones del interior no se filtran al stack padre.
+El título de la pestaña de una carpeta (p. ej. `settings/`) sale del
+`metadata` de su `index`.
 
 ## Paso 2 — `layout.ts` declarativo + contrato `children`
 

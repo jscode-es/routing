@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ReactNode } from 'react';
 import type { RouteNode } from '../route-tree/types';
+import { staticMetadata } from './metadata';
 
 export interface TabIconProps {
   focused: boolean;
@@ -43,6 +44,30 @@ export function collectTabConfigs(
   return configs;
 }
 
+function nodeForTab(
+  layoutNode: RouteNode,
+  name: string,
+): RouteNode | undefined {
+  return name === 'index'
+    ? layoutNode
+    : layoutNode.children.find((child) => child.segment === name);
+}
+
+// Precedencia por campo: opciones explícitas de <Tabs.Screen> por encima
+// de la metadata de la página (title plano, icono bajo metadata.tab).
+function tabOptions(
+  layoutNode: RouteNode,
+  name: string,
+  explicit: TabsScreenOptions,
+): TabsScreenOptions {
+  const node = nodeForTab(layoutNode, name);
+  const meta = node ? staticMetadata(node) : {};
+  return {
+    title: explicit.title ?? meta.title,
+    icon: explicit.icon ?? meta.tab?.icon,
+  };
+}
+
 export function resolveTabs(
   layoutNode: RouteNode,
   children: ReactNode,
@@ -51,18 +76,24 @@ export function resolveTabs(
   React.Children.forEach(children, (child) => {
     if (React.isValidElement(child) && child.type === TabsScreen) {
       const { name, options } = child.props as TabsScreenProps;
-      explicit.push({ name, options: options ?? {} });
+      explicit.push({
+        name,
+        options: tabOptions(layoutNode, name, options ?? {}),
+      });
     }
   });
   if (explicit.length > 0) return explicit;
 
   const tabs: TabDescriptor[] = [];
   if (layoutNode.component !== undefined) {
-    tabs.push({ name: 'index', options: {} });
+    tabs.push({ name: 'index', options: tabOptions(layoutNode, 'index', {}) });
   }
   for (const child of layoutNode.children) {
     if (child.component !== undefined && child.type === 'static') {
-      tabs.push({ name: child.segment, options: {} });
+      tabs.push({
+        name: child.segment,
+        options: tabOptions(layoutNode, child.segment, {}),
+      });
     }
   }
   return tabs;

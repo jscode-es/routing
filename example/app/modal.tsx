@@ -1,6 +1,16 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from '@jscode/react-native-routing';
+import type { ScreenMetadata } from '@jscode/react-native-routing';
+
+export const metadata: ScreenMetadata = {
+  title: 'Modal',
+  presentation: 'modal',
+  headerShown: false,
+  safeArea: false,
+  orientation: 'landscape',
+  contentStyle: { backgroundColor: '#111' },
+};
 
 export default function Modal() {
   const router = useRouter();
