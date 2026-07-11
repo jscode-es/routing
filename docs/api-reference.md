@@ -25,6 +25,31 @@ export default function App() {
 | `initialPath` | Ruta inicial (por defecto `/`). |
 | `logRoutes` | Solo desarrollo: imprime el árbol de rutas descubierto (navegador por carpeta, URLs, títulos) al montar y al reevaluarse con Fast Refresh. `false` lo desactiva. Los logs del cliente se ven en logcat/Console y en React Native DevTools. |
 
+## Props de página y layout
+
+### `PageProps` / `LayoutProps`
+
+Toda página recibe `params` (segmentos dinámicos resueltos de su entrada)
+y `pathname` como props, al estilo de Next.js:
+
+```tsx
+// app/users/[id].tsx
+import type { PageProps } from '@jscode/react-native-routing';
+
+export default function User({ params, pathname }: PageProps<{ id: string }>) {
+  return <Text>{`User ${params.id} (${pathname})`}</Text>;
+}
+```
+
+Los layouts reciben lo mismo más `children` (`LayoutProps`); su
+`params`/`pathname` siguen a la entrada superior de su grupo, así que se
+actualizan al navegar dentro del navegador que envuelven. Las pantallas
+en background conservan sus propias props aunque la entrada activa viva
+en otro subárbol. Los catch-all llegan como `string[]`.
+
+Los hooks (`useLocalSearchParams`, `usePathname`, …) siguen disponibles
+para componentes anidados que no reciben las props de la página.
+
 ## Metadata por página
 
 ### `metadata` / `generateMetadata`

@@ -8,6 +8,7 @@ import type { ComponentType, ReactNode } from 'react';
 import { hasImplicitStack } from '../route-tree/implicit';
 import type { RouteNode } from '../route-tree/types';
 import { DeclaredNavigator } from './DeclaredNavigator';
+import type { LayoutProps, PageProps } from './page-props';
 import { warnDev } from './dev';
 import { readNavigatorConfig } from './navigator-config';
 import type { NavigationEntry } from './reducer';
@@ -91,14 +92,19 @@ export function RouteLevel({
   index: number;
 }): React.JSX.Element | null {
   const [levelMounts] = useState(createMountRegistry);
+  // Entrada del subárbol propio: las pantallas en background conservan sus
+  // params/pathname aunque activeEntry viva en otro subárbol.
+  const ownEntry = useContext(EntryContext);
+  const { activeEntry } = useRouterState();
   const node = chain[index];
   if (!node) return null;
+  const entry = ownEntry ?? activeEntry;
 
   const isLeaf = index === chain.length - 1;
-  const Component = node.component as ComponentType | undefined;
+  const Component = node.component as ComponentType<PageProps> | undefined;
   const inner = isLeaf ? (
     Component ? (
-      <Component />
+      <Component params={entry.match.params} pathname={entry.pathname} />
     ) : null
   ) : (
     <RouteLevel chain={chain} index={index + 1} />
@@ -119,10 +125,12 @@ export function RouteLevel({
 
   let body = content;
   if (node.layout) {
-    const Layout = node.layout as ComponentType<{ children?: ReactNode }>;
+    const Layout = node.layout as ComponentType<LayoutProps>;
     body = (
       <SlotContext.Provider value={inner}>
-        <Layout>{content}</Layout>
+        <Layout params={entry.match.params} pathname={entry.pathname}>
+          {content}
+        </Layout>
       </SlotContext.Provider>
     );
   }
@@ -147,9 +155,11 @@ export function EntrySubtree({
   // Ruta index: la hoja es el propio nodo del layout, no hay nivel inferior.
   if (layoutDepth === chain.length - 1) {
     const Component = chain[layoutDepth]?.component as
-      | ComponentType
+      | ComponentType<PageProps>
       | undefined;
-    return Component ? <Component /> : null;
+    return Component ? (
+      <Component params={entry.match.params} pathname={entry.pathname} />
+    ) : null;
   }
   return <RouteLevel chain={chain} index={layoutDepth + 1} />;
 }

@@ -30,17 +30,21 @@ Los corchetes marcan un segmento dinámico, igual que en Next.js/Expo Router:
 | `app/users/[id].tsx`             | `/users/:id`        | `/users/42` → `id="42"`  |
 | `app/[category]/[item].tsx`      | `/:category/:item`  | `/shoes/nike-air`         |
 
-El valor se lee en tiempo de ejecución con `useLocalSearchParams()`:
+El valor llega a la página como prop `params` (junto a `pathname`, igual
+que en Next.js):
 
 ```tsx
 // app/users/[id].tsx
-import { useLocalSearchParams } from '@jscode/react-native-routing';
+import type { PageProps } from '@jscode/react-native-routing';
 
-export default function UserScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  return <Text>User {id}</Text>;
+export default function UserScreen({ params }: PageProps<{ id: string }>) {
+  return <Text>User {params.id}</Text>;
 }
 ```
+
+Los layouts reciben las mismas props además de `children`
+(`LayoutProps`). Para componentes anidados que no reciben las props de la
+página existe el hook `useLocalSearchParams()`.
 
 ## Segmentos catch-all
 

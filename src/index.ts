@@ -14,6 +14,7 @@ export type {
   ScreenMetadata,
 } from './navigation/metadata';
 export type { NavigatorConfig } from './navigation/navigator-config';
+export type { LayoutProps, PageProps } from './navigation/page-props';
 export { Tabs } from './navigation/Tabs';
 export type {
   TabsScreenOptions,

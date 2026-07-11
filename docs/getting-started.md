@@ -135,16 +135,14 @@ export default function Home() {
 ```tsx
 // app/users/[id].tsx
 import { Text } from 'react-native';
-import { useLocalSearchParams } from '@jscode/react-native-routing';
-import type { GenerateMetadata } from '@jscode/react-native-routing';
+import type { GenerateMetadata, PageProps } from '@jscode/react-native-routing';
 
 export const generateMetadata: GenerateMetadata = ({ params }) => ({
   title: `Usuario ${String(params.id)}`,
 });
 
-export default function User() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  return <Text>User {id}</Text>;
+export default function User({ params }: PageProps<{ id: string }>) {
+  return <Text>User {params.id}</Text>;
 }
 ```
 

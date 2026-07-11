@@ -104,18 +104,21 @@ export default function Home() {
 ```tsx
 // app/users/[id].tsx  →  /users/:id, con título dinámico
 import { Text } from 'react-native';
-import { useLocalSearchParams } from '@jscode/react-native-routing';
-import type { GenerateMetadata } from '@jscode/react-native-routing';
+import type { GenerateMetadata, PageProps } from '@jscode/react-native-routing';
 
 export const generateMetadata: GenerateMetadata = ({ params }) => ({
   title: `Usuario ${String(params.id)}`,
 });
 
-export default function User() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  return <Text>User {id}</Text>;
+export default function User({ params }: PageProps<{ id: string }>) {
+  return <Text>User {params.id}</Text>;
 }
 ```
+
+Toda página recibe `params` y `pathname` como props (estilo Next.js); los
+layouts también, además de `children`. Para componentes anidados que no
+reciben las props de la página están los hooks (`useLocalSearchParams`,
+`usePathname`).
 
 **5. ¿Tabs?** Una carpeta con un `layout.ts` de una línea; título e icono
 salen del `metadata` de cada pestaña:
