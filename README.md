@@ -120,6 +120,17 @@ layouts también, además de `children`. Para componentes anidados que no
 reciben las props de la página están los hooks (`useLocalSearchParams`,
 `usePathname`).
 
+El nombre entre corchetes es libre y los segmentos dinámicos se anidan:
+
+```
+app/posts/[slug].tsx       → /posts/:slug     → params.slug
+app/[category]/[item].tsx  → /:category/:item → params.category, params.item
+app/blog/[...slug].tsx     → /blog/*          → params.slug (string[])
+```
+
+Prioridad de match: estático > dinámico > catch-all (`posts/destacado.tsx`
+gana a `posts/[slug].tsx` para `/posts/destacado`).
+
 **5. ¿Tabs?** Una carpeta con un `layout.ts` de una línea; título e icono
 salen del `metadata` de cada pestaña:
 
