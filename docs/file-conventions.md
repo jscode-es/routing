@@ -66,42 +66,74 @@ app/
     login.tsx        →  /login
     register.tsx     →  /register
   (tabs)/
-    layout.tsx       →  define el tab navigator inferior
+    layout.ts        →  export const navigator = { type: 'tabs' }
     home.tsx          →  /home
     profile.tsx       →  /profile
 ```
 
 Tanto `(auth)` como `(tabs)` son invisibles en la ruta resultante; solo
-existen para delimitar el alcance de un `layout.tsx`.
+existen para delimitar el alcance de un navegador (aquí `(auth)`, con dos
+rutas, monta su propio stack implícito, y `(tabs)` declara unas Tabs).
 
-## Layouts (`layout.tsx`)
+## Navegadores por carpeta: el Stack implícito
 
-Un archivo `layout.tsx` define el navegador (Stack, Tabs, Drawer, …) para
-todas las rutas hermanas y anidadas de esa carpeta — el mismo rol que el
-`_layout.tsx` de Expo Router (aquí sin el guion bajo) y que el
-`layout.tsx` de Next.js. Exporta un componente por defecto que renderiza
-una de las primitivas de navegador del paquete:
+**Una app funciona sin ningún archivo de layout.** La carpeta define el
+navegador: la raíz `app/` monta siempre un `<Stack>` nativo implícito, y
+cualquier carpeta con más de una entrada navegable monta el suyo propio
+(el push entra a la pila de esa carpeta). Una carpeta con una única ruta
+hoja (por ejemplo `users/[id].tsx`) no crea pila: su pantalla vive en el
+stack ancestro.
+
+Las opciones de cada pantalla (título del header, presentación modal,
+icono de pestaña…) se declaran en la propia página con
+`export const metadata` — ver
+[api-reference.md](./api-reference.md#metadata--generatemetadata).
+
+## Layouts (`layout.ts` / `layout.tsx`)
+
+Un archivo `layout` cambia o envuelve el navegador de su carpeta. Puede
+exportar dos cosas, juntas o por separado:
+
+**`export const navigator`** — config declarativa del navegador, sin JSX:
+
+```ts
+// app/(tabs)/layout.ts
+import type { NavigatorConfig } from '@jscode/react-native-routing';
+
+export const navigator: NavigatorConfig = { type: 'tabs', animation: 'fade' };
+```
+
+`type` acepta `'stack'`, `'tabs'` o `'slot'` (paso directo: la carpeta no
+introduce nivel de navegación — el comportamiento que antes era el
+default sin layout).
+
+**Un componente default con `children`** — UI compartida estilo Next.js:
+recibe como `children` el navegador ya resuelto de la carpeta (el
+declarado o el implícito) y lo envuelve con providers, guards o shells.
+El layout persiste al navegar entre sus hijos — no se remonta al hacer
+push ni al cambiar de pestaña:
 
 ```tsx
 // app/(tabs)/layout.tsx
-import { Tabs } from '@jscode/react-native-routing';
+export const navigator: NavigatorConfig = { type: 'tabs' };
 
-export default function TabsLayout() {
-  return (
-    <Tabs>
-      <Tabs.Screen name="home" options={{ title: 'Home' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
-    </Tabs>
-  );
+export default function TabsShell({ children }: { children?: ReactNode }) {
+  const session = useSession();
+  if (!session) return <Redirect href="/login" />;
+  return <ThemeProvider>{children}</ThemeProvider>;
 }
 ```
 
-Los layouts se anidan: un `layout.tsx` en `app/` envuelve toda la app (por
-ejemplo, un Stack raíz), y un `layout.tsx` dentro de `app/(tabs)/` envuelve
-solo ese grupo. Si una carpeta no tiene `layout.tsx`, las rutas se
-renderizan directamente bajo el layout padre más cercano (paso directo
-implícito, el mismo comportamiento por defecto que el `<Slot>` de Expo
-Router).
+Los layouts se anidan: uno en `app/` envuelve toda la app y uno en un
+grupo, solo su subárbol. El modo manual sigue disponible como escape
+hatch: un componente que ignora `children` y renderiza su propio
+`<Stack>`/`<Tabs>` con `<Stack.Screen>`/`<Tabs.Screen>` explícitos manda
+sobre todo (renderizar a la vez `{children}` y un navegador propio avisa
+en desarrollo).
+
+Cuando el hijo directo de un stack tiene navegador propio (declarado,
+manual o implícito), su pantalla exterior oculta el header nativo por
+defecto: el navegador interior gestiona los suyos.
 
 ## Ruta not-found
 
@@ -113,13 +145,17 @@ hace falta añadir nada.
 
 ## Nombres reservados
 
-| Nombre            | Propósito                                    |
-| ------------------- | ---------------------------------------------- |
-| `layout.tsx`        | Navegador/layout de la carpeta                |
-| `not-found.tsx`      | Fallback 404 (con default del paquete)        |
-| `[name].tsx`         | Segmento dinámico                             |
-| `[...name].tsx`      | Segmento catch-all                            |
-| `(name)/`            | Grupo de rutas (sin segmento en la ruta)      |
+| Nombre               | Propósito                                                  |
+| ---------------------- | ------------------------------------------------------------ |
+| `layout.ts(x)`         | Navegador declarativo y/o UI compartida de la carpeta       |
+| `not-found.tsx`        | Fallback 404 (con default del paquete); acepta `metadata`   |
+| `[name].tsx`           | Segmento dinámico                                           |
+| `[...name].tsx`        | Segmento catch-all                                          |
+| `(name)/`              | Grupo de rutas (sin segmento en la ruta)                    |
+
+Exports reservadas en cualquier página: `metadata` (opciones de pantalla)
+y `generateMetadata` (metadata dependiente de params) — ambas opcionales,
+su ausencia es el caso base.
 
 Cualquier otro archivo bajo `app/` que no sea un nombre reservado y no
 sea importado por un hermano, se trata como una ruta.

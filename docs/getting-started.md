@@ -110,26 +110,22 @@ necesita `react-native-gesture-handler` — no hace falta añadirlo a mano.
 
 ## 6. Crear las primeras rutas
 
+No hace falta ningún layout: la raíz `app/` monta un stack nativo
+implícito y cada página declara sus opciones con `metadata`:
+
 ```
 app/
-  layout.tsx
   index.tsx
   users/
     [id].tsx
 ```
 
 ```tsx
-// app/layout.tsx
-import { Stack } from '@jscode/react-native-routing';
-
-export default function RootLayout() {
-  return <Stack />;
-}
-```
-
-```tsx
 // app/index.tsx
 import { Link } from '@jscode/react-native-routing';
+import type { ScreenMetadata } from '@jscode/react-native-routing';
+
+export const metadata: ScreenMetadata = { title: 'Home' };
 
 export default function Home() {
   return <Link href="/users/42">Ir al usuario 42</Link>;
@@ -140,12 +136,23 @@ export default function Home() {
 // app/users/[id].tsx
 import { Text } from 'react-native';
 import { useLocalSearchParams } from '@jscode/react-native-routing';
+import type { GenerateMetadata } from '@jscode/react-native-routing';
+
+export const generateMetadata: GenerateMetadata = ({ params }) => ({
+  title: `Usuario ${String(params.id)}`,
+});
 
 export default function User() {
   const { id } = useLocalSearchParams<{ id: string }>();
   return <Text>User {id}</Text>;
 }
 ```
+
+Al arrancar, el paquete imprime en desarrollo el árbol de rutas
+descubierto (visible en logcat/React Native DevTools), con el navegador
+de cada carpeta, la URL y el título de cada pantalla. Para añadir unas
+tabs, basta una carpeta con un `layout.ts` de una línea — ver
+[file-conventions.md](./file-conventions.md#layouts-layoutts--layouttsx).
 
 Ejecuta la app como siempre (`npm run ios` / `npm run android`) — no hace
 falta ningún paso de codegen adicional: los archivos nuevos bajo `app/` se

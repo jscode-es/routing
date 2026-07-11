@@ -8,18 +8,25 @@ y `react-native-reanimated`.
 
 ```
 app/
-  layout.tsx         → <Stack> raíz
-  index.tsx          → /
+  index.tsx          → /            (stack raíz implícito, sin layouts)
   users/[id].tsx     → /users/:id
-  (tabs)/layout.tsx  → <Tabs>
+  (tabs)/layout.ts   → export const navigator = { type: 'tabs' }
   not-found.tsx      → fallback 404 (opcional)
 ```
 
 ## Características
 
 - Rutas por archivos: estáticas, dinámicas (`[id]`), catch-all
-  (`[...slug]`), grupos (`(group)`), layouts anidados (`layout.tsx`) y
-  `not-found` (con pantalla 404 por defecto si la app no la define).
+  (`[...slug]`), grupos (`(group)`), layouts anidados y `not-found` (con
+  pantalla 404 por defecto si la app no la define).
+- Cero layouts obligatorios: stack nativo implícito por carpeta, tabs con
+  un `layout.ts` declarativo de una línea, y opciones de pantalla
+  colocalizadas en cada página (`export const metadata` /
+  `generateMetadata`), al estilo Next.js. Los layouts con componente
+  reciben el navegador como `children` y persisten entre pantallas.
+- Árbol de rutas visual en desarrollo: al arrancar se imprime el árbol
+  descubierto con navegadores, URLs y títulos (`logRoutes={false}` lo
+  desactiva).
 - `<Stack>` nativo (`ScreenStack`): transiciones push/pop nativas, header
   nativo, `presentation: 'modal'`, botón físico atrás en Android,
   swipe-to-go-back en iOS.

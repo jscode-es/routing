@@ -1,9 +1,15 @@
 # RFC: metadata por pantalla y navegadores inferidos
 
-> **Estado: propuesta, sin implementar.** Este documento plantea el diseño;
-> no describe comportamiento actual del paquete. Para la API vigente ver
-> [api-reference.md](./api-reference.md) y
-> [file-conventions.md](./file-conventions.md).
+> **Estado: implementado** (Fase 10 del [roadmap](./roadmap.md), julio
+> 2026). Se conserva como registro de diseño y de las decisiones tomadas;
+> la documentación vigente está en [api-reference.md](./api-reference.md)
+> y [file-conventions.md](./file-conventions.md). Diferencias menores
+> respecto al texto original: la lectura de metadata resultó de coste
+> cero también en Stack (los módulos ya se ejecutan al construir el
+> árbol), `not-found.tsx` también acepta `metadata`, y el stack implícito
+> aplica además a cualquier carpeta con más de una entrada navegable (no
+> solo a la raíz), con header exterior oculto por defecto sobre
+> navegadores anidados.
 
 ## Motivación
 
