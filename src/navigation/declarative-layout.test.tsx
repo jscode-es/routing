@@ -130,6 +130,40 @@ describe('declarative navigator (layout.ts)', () => {
     expect(headers[2]?.props.title).toBe('Detalle sec');
   });
 
+  it('orders the tabs with the navigator order config', async () => {
+    const ctx = fakeContext({
+      './(tabs)/layout.ts': {
+        navigator: { type: 'tabs', order: ['profile', 'settings', 'home'] },
+      },
+      './(tabs)/home.tsx': { default: Home },
+      './(tabs)/profile.tsx': { default: () => <Text>P</Text> },
+      './(tabs)/settings.tsx': { default: () => <Text>S</Text> },
+    });
+    await render(<RootRouter context={ctx} initialPath="/home" />);
+    const names = screen
+      .getAllByTestId(/^tab-/)
+      .map((tab) => tab.props.testID as string)
+      .filter((id) => id !== 'tab-indicator');
+    expect(names).toEqual(['tab-profile', 'tab-settings', 'tab-home']);
+  });
+
+  it('keeps unlisted tabs after the ordered ones, in file order', async () => {
+    const ctx = fakeContext({
+      './(tabs)/layout.ts': {
+        navigator: { type: 'tabs', order: ['settings'] },
+      },
+      './(tabs)/index.tsx': { default: Home },
+      './(tabs)/profile.tsx': { default: () => <Text>P</Text> },
+      './(tabs)/settings.tsx': { default: () => <Text>S</Text> },
+    });
+    await render(<RootRouter context={ctx} />);
+    const names = screen
+      .getAllByTestId(/^tab-/)
+      .map((tab) => tab.props.testID as string)
+      .filter((id) => id !== 'tab-indicator');
+    expect(names).toEqual(['tab-settings', 'tab-index', 'tab-profile']);
+  });
+
   it('warns and falls back to pass-through on a malformed navigator export', async () => {
     const ctx = fakeContext({
       './layout.tsx': { default: () => <Stack /> },

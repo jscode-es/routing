@@ -7,6 +7,9 @@ export interface NavigatorConfig {
   // Solo para type 'tabs':
   animation?: 'none' | 'fade';
   showLabel?: boolean;
+  // Orden de las pestañas por nombre de ruta; las no listadas van detrás
+  // en su orden natural (index primero, resto por descubrimiento).
+  order?: string[];
 }
 
 const NAVIGATOR_TYPES: readonly string[] = ['stack', 'tabs', 'slot'];

@@ -9,7 +9,13 @@ export function DeclaredNavigator({
   config: NavigatorConfig;
 }): React.JSX.Element {
   if (config.type === 'tabs') {
-    return <Tabs animation={config.animation} showLabel={config.showLabel} />;
+    return (
+      <Tabs
+        animation={config.animation}
+        showLabel={config.showLabel}
+        order={config.order}
+      />
+    );
   }
   return <Stack />;
 }

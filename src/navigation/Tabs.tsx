@@ -87,10 +87,12 @@ function TabsComponent({
   children,
   animation = 'none',
   showLabel = true,
+  order,
 }: {
   children?: ReactNode;
   animation?: 'none' | 'fade';
   showLabel?: boolean;
+  order?: string[];
 }): React.JSX.Element {
   const { tree, activeEntry } = useRouterState();
   useNavigatorMountGuard();
@@ -103,7 +105,7 @@ function TabsComponent({
   const { chain } = referenceEntry.match;
   const layoutNode = chain[layoutDepth] ?? tree;
 
-  const tabs = resolveTabs(layoutNode, children);
+  const tabs = resolveTabs(layoutNode, children, order);
   const activeName = screenNameForEntry(referenceEntry, layoutDepth);
   const activeIndex = Math.max(
     0,

@@ -68,9 +68,22 @@ function tabOptions(
   };
 }
 
+function sortTabs(
+  tabs: TabDescriptor[],
+  order: string[] | undefined,
+): TabDescriptor[] {
+  if (!order || order.length === 0) return tabs;
+  const listed = tabs
+    .filter((tab) => order.includes(tab.name))
+    .sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+  const rest = tabs.filter((tab) => !order.includes(tab.name));
+  return [...listed, ...rest];
+}
+
 export function resolveTabs(
   layoutNode: RouteNode,
   children: ReactNode,
+  order?: string[],
 ): TabDescriptor[] {
   const explicit: TabDescriptor[] = [];
   React.Children.forEach(children, (child) => {
@@ -82,7 +95,7 @@ export function resolveTabs(
       });
     }
   });
-  if (explicit.length > 0) return explicit;
+  if (explicit.length > 0) return sortTabs(explicit, order);
 
   const tabs: TabDescriptor[] = [];
   if (layoutNode.component !== undefined) {
@@ -96,7 +109,7 @@ export function resolveTabs(
       });
     }
   }
-  return tabs;
+  return sortTabs(tabs, order);
 }
 
 export function hrefForTab(

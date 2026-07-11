@@ -115,8 +115,14 @@ export const navigator: NavigatorConfig = {
   type: 'tabs',      // 'stack' | 'tabs' | 'slot'
   animation: 'fade', // solo tabs
   showLabel: true,   // solo tabs
+  order: ['home', 'search', 'profile'], // solo tabs, opcional
 };
 ```
+
+Sin `order`, las pestañas salen con `index` primero y el resto en el
+orden de descubrimiento de archivos (alfabético). Con `order`, los
+nombres listados van primero en ese orden y los no listados detrás, en su
+orden natural.
 
 Sin archivo de layout, la raíz monta un `<Stack>` implícito siempre, y
 cualquier carpeta con más de una entrada navegable también; `'slot'`
@@ -226,8 +232,10 @@ paquete no bundlea ningún set de iconos, pasa el tuyo (un `Image`, un SVG,
 ```
 
 Props de `<Tabs>`: `animation` (`'none'` por defecto, `'fade'` funde el
-contenido al cambiar de pestaña con reanimated) y `showLabel` (`false`
-para modo solo-iconos).
+contenido al cambiar de pestaña con reanimated), `showLabel` (`false`
+para modo solo-iconos) y `order` (orden de las pestañas por nombre de
+ruta; las no listadas van detrás en su orden natural — mismo
+comportamiento que el `order` de `NavigatorConfig`).
 
 ### `<Slot>`
 
