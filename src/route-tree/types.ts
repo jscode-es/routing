@@ -7,10 +7,12 @@ export interface RouteNode<C = unknown> {
   component?: C;
   layout?: C;
   notFound?: C;
-  // Exports opcionales del módulo de página (RFC metadata-layouts); se
-  // guardan sin validar — la capa de navegación los lee y valida.
+  // Exports opcionales de los módulos (RFC metadata-layouts); se guardan
+  // sin validar — la capa de navegación los lee y valida. metadata y
+  // generateMetadata vienen de páginas; navigator, de layouts.
   metadata?: unknown;
   generateMetadata?: unknown;
+  navigator?: unknown;
   children: RouteNode<C>[];
 }
 

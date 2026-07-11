@@ -66,35 +66,44 @@ exterior cuando el grupo contiene un layout anidado (mismo criterio que
 El título de la pestaña de una carpeta (p. ej. `settings/`) sale del
 `metadata` de su `index`.
 
-## Paso 2 — `layout.ts` declarativo + contrato `children`
+## Paso 2 — `layout.ts` declarativo + contrato `children` ✅
 
-- [ ] Definir `NavigatorConfig` (`type: 'stack' | 'tabs' | 'slot'` +
-      props del navegador: `animation`, `showLabel`, …)
-- [ ] `parse.ts` (vitest): reconocer `layout.ts` además de `layout.tsx`
-      como nombre reservado, sin cambiar la forma del árbol
+- [x] Definir `NavigatorConfig` (`type: 'stack' | 'tabs' | 'slot'` +
+      `animation`/`showLabel` para tabs) — `src/navigation/navigator-config.ts`
+- [x] `parse.ts` (vitest): `layout.ts` ya entraba como nombre reservado;
+      lo nuevo es tolerar un layout sin default export cuando exporta
+      `navigator` (y error claro si no exporta ninguna de las dos)
 
-Tests jest, antes del código:
+Tests jest (`src/navigation/declarative-layout.test.tsx`), antes del código:
 
-- [ ] Carpeta con `export const navigator = { type: 'tabs', … }` monta
-      Tabs con esas props, sin componente
-- [ ] `{ type: 'slot' }` reproduce el paso directo actual
-- [ ] `layout.tsx` con default export que renderiza `{children}` recibe
-      el navegador de la carpeta y lo envuelve (providers/guards)
-- [ ] Ambas exports (`navigator` + componente) conviven en el mismo
+- [x] Carpeta con `export const navigator = { type: 'tabs', … }` monta
+      Tabs con esas props, sin componente (también stack raíz declarativo)
+- [x] `{ type: 'slot' }` reproduce el paso directo actual
+- [x] `layout.tsx` con default export que renderiza `{children}` recibe
+      el navegador de la carpeta y lo envuelve
+- [x] Ambas exports (`navigator` + componente) conviven en el mismo
       archivo
-- [ ] Persistencia: el layout **no se remonta** al hacer push ni al
-      cambiar de pestaña entre sus hijos (contador de renders/efectos)
-- [ ] Componente que ignora `children` y monta su propio
+- [x] Persistencia: el layout **no se remonta** al hacer push ni al
+      cambiar de pestaña entre sus hijos
+- [x] Componente que ignora `children` y monta su propio
       `<Stack>`/`<Tabs>` = modo manual actual, sin navegador duplicado
-- [ ] Renderizar a la vez navegador propio y `{children}` → warning en
-      desarrollo
+- [x] Renderizar a la vez navegador propio y `{children}` → warning en
+      desarrollo (registro de montaje por nivel de ruta)
+- [x] `navigator` malformado → warning en dev y paso directo
 
 Cierre del paso:
 
-- [ ] `example/`: reemplazar `app/(tabs)/layout.tsx` por `layout.ts` +
-      `metadata` en `index`/`profile`/`settings`; verificar tabs, iconos
-      y congelado de pestañas en emulador
-- [ ] `npm run typecheck && npm run lint && npm run test`
+- [x] `example/`: `app/(tabs)/layout.tsx` y `settings/layout.tsx`
+      reemplazados por `layout.ts` declarativos (el título del detalle
+      pasó a metadata); verificado en emulador: tabs con fade, iconos, y
+      push dentro del sub-stack declarado con su header
+- [ ] **Checklist iOS (pendiente de Mac)**
+- [x] `npm run typecheck && npm run lint && npm run test`
+
+Notas de implementación: el push agrupa entradas cuando el hijo directo
+tiene navegador propio (layout manual **o** config declarativa; slot no);
+`SlotContext` se mantiene con el subárbol directo por compatibilidad con
+`<Slot>`, y `{children}` en un layout sin config equivale al Slot de hoy.
 
 ## Paso 3 — Árbol de rutas visual en la terminal (DX)
 

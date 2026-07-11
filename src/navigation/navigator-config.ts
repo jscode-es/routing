@@ -1,0 +1,42 @@
+import type { RouteNode } from '../route-tree/types';
+import { warnDev } from './dev';
+
+export interface NavigatorConfig {
+  type: 'stack' | 'tabs' | 'slot';
+  // Solo para type 'tabs':
+  animation?: 'none' | 'fade';
+  showLabel?: boolean;
+}
+
+const NAVIGATOR_TYPES: readonly string[] = ['stack', 'tabs', 'slot'];
+
+const warned = new WeakSet<object>();
+
+export function readNavigatorConfig(
+  node: RouteNode,
+): NavigatorConfig | undefined {
+  const raw = node.navigator;
+  if (raw === undefined) return undefined;
+  const type =
+    typeof raw === 'object' && raw !== null && !Array.isArray(raw)
+      ? (raw as { type?: unknown }).type
+      : undefined;
+  if (typeof type !== 'string' || !NAVIGATOR_TYPES.includes(type)) {
+    if (!warned.has(node)) {
+      warned.add(node);
+      warnDev(
+        `Ignoring the navigator export of layout "${node.segment || '/'}": expected { type: 'stack' | 'tabs' | 'slot' }.`,
+      );
+    }
+    return undefined;
+  }
+  return raw as NavigatorConfig;
+}
+
+// Un hijo con navegador propio agrupa sus entradas en una sola pantalla del
+// stack exterior (mismo criterio que un layout manual); slot no crea nivel.
+export function createsNavigator(node: RouteNode): boolean {
+  if (node.layout !== undefined) return true;
+  const config = readNavigatorConfig(node);
+  return config !== undefined && config.type !== 'slot';
+}

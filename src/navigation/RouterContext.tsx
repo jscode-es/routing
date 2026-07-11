@@ -1,6 +1,14 @@
-import React, { createContext, useContext } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import type { ComponentType, ReactNode } from 'react';
 import type { RouteNode } from '../route-tree/types';
+import { DeclaredNavigator } from './DeclaredNavigator';
+import { warnDev } from './dev';
+import { readNavigatorConfig } from './navigator-config';
 import type { NavigationEntry } from './reducer';
 import type { Router } from './router';
 
@@ -32,6 +40,38 @@ export const DepthContext = createContext(0);
 
 export const SlotContext = createContext<ReactNode>(null);
 
+// Registro de navegadores montados en un mismo nivel de ruta: cada
+// RouteLevel provee el suyo, y Stack/Tabs se registran para detectar un
+// layout que renderiza a la vez {children} y un navegador propio.
+interface NavigatorMountRegistry {
+  register(): () => void;
+}
+
+function createMountRegistry(): NavigatorMountRegistry {
+  let count = 0;
+  return {
+    register() {
+      count += 1;
+      if (count > 1) {
+        warnDev(
+          'A route level mounted more than one navigator: render either {children} or an explicit <Stack>/<Tabs> in the layout, not both.',
+        );
+      }
+      return () => {
+        count -= 1;
+      };
+    },
+  };
+}
+
+export const NavigatorMountContext =
+  createContext<NavigatorMountRegistry | null>(null);
+
+export function useNavigatorMountGuard(): void {
+  const registry = useContext(NavigatorMountContext);
+  useEffect(() => registry?.register(), [registry]);
+}
+
 export function useRouterState(): RouterState {
   const state = useContext(RouterStateContext);
   if (!state) {
@@ -49,6 +89,7 @@ export function RouteLevel({
   chain: RouteNode[];
   index: number;
 }): React.JSX.Element | null {
+  const [levelMounts] = useState(createMountRegistry);
   const node = chain[index];
   if (!node) return null;
 
@@ -62,17 +103,35 @@ export function RouteLevel({
     <RouteLevel chain={chain} index={index + 1} />
   );
 
-  let body = inner;
+  // El contenido del nivel es el navegador declarado en layout.ts (slot y
+  // ausencia de config son el paso directo). Un layout con componente lo
+  // recibe como children (contrato estilo Next.js); SlotContext se mantiene
+  // con el subárbol directo por compatibilidad con <Slot>.
+  const config = readNavigatorConfig(node);
+  const content =
+    config && config.type !== 'slot' ? (
+      <DeclaredNavigator config={config} />
+    ) : (
+      inner
+    );
+
+  let body = content;
   if (node.layout) {
-    const Layout = node.layout as ComponentType;
+    const Layout = node.layout as ComponentType<{ children?: ReactNode }>;
     body = (
       <SlotContext.Provider value={inner}>
-        <Layout />
+        <Layout>{content}</Layout>
       </SlotContext.Provider>
     );
   }
 
-  return <DepthContext.Provider value={index}>{body}</DepthContext.Provider>;
+  return (
+    <DepthContext.Provider value={index}>
+      <NavigatorMountContext.Provider value={levelMounts}>
+        {body}
+      </NavigatorMountContext.Provider>
+    </DepthContext.Provider>
+  );
 }
 
 export function EntrySubtree({

@@ -6,6 +6,7 @@ export interface RequireContext {
     default?: unknown;
     metadata?: unknown;
     generateMetadata?: unknown;
+    navigator?: unknown;
   };
   keys(): string[];
 }
@@ -13,18 +14,10 @@ export interface RequireContext {
 export function buildRouteTree(ctx: RequireContext): RouteNode {
   return parse(
     ctx.keys(),
+    (key) => ctx(key).default,
     (key) => {
-      const component = ctx(key).default;
-      if (component === undefined) {
-        throw new Error(
-          `Route file "${key}" has no default export. Every route file must export its screen component as default.`,
-        );
-      }
-      return component;
-    },
-    (key) => {
-      const { metadata, generateMetadata } = ctx(key);
-      return { metadata, generateMetadata };
+      const { metadata, generateMetadata, navigator } = ctx(key);
+      return { metadata, generateMetadata, navigator };
     },
   );
 }

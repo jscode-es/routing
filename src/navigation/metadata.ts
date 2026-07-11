@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { RouteNode, RouteParams } from '../route-tree/types';
+import { warnDev } from './dev';
 import type { NavigationEntry } from './reducer';
 import type { StackScreenOptions } from './stack-options';
 import type { TabIconProps } from './tabs-options';
@@ -21,14 +22,6 @@ export interface GenerateMetadataContext {
 export type GenerateMetadata = (
   context: GenerateMetadataContext,
 ) => ScreenMetadata;
-
-declare const __DEV__: boolean;
-
-function warnDev(message: string): void {
-  if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    console.warn(message);
-  }
-}
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

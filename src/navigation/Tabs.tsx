@@ -14,6 +14,7 @@ import {
   EntryContext,
   EntrySubtree,
   TabSwitchContext,
+  useNavigatorMountGuard,
   useRouterState,
 } from './RouterContext';
 import { createEntry } from './reducer';
@@ -92,6 +93,7 @@ function TabsComponent({
   showLabel?: boolean;
 }): React.JSX.Element {
   const { tree, activeEntry } = useRouterState();
+  useNavigatorMountGuard();
   const layoutDepth = useContext(DepthContext);
   const parentEntry = useContext(EntryContext);
   const switchTab = useContext(TabSwitchContext);

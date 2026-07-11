@@ -13,6 +13,7 @@ export type {
   GenerateMetadataContext,
   ScreenMetadata,
 } from './navigation/metadata';
+export type { NavigatorConfig } from './navigation/navigator-config';
 export { Tabs } from './navigation/Tabs';
 export type {
   TabsScreenOptions,

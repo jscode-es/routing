@@ -152,24 +152,60 @@ describe('metadata exports', () => {
     expect(id.generateMetadata).toBe(gen);
   });
 
-  it('does not resolve metadata for layout or not-found files', () => {
-    const asked: string[] = [];
+  it('does not attach metadata from layout or not-found exports', () => {
     const tree = parse(
-      ['./layout.tsx', './not-found.tsx', './index.tsx'],
+      ['./sec/layout.tsx', './sec/not-found.tsx', './sec/index.tsx'],
       resolve,
-      (key) => {
-        asked.push(key);
-        return {};
-      },
+      (key) =>
+        key === './sec/index.tsx' ? {} : { metadata: { title: 'X' } },
     );
-    expect(asked).toEqual(['./index.tsx']);
-    expect(tree.metadata).toBeUndefined();
+    const sec = child(tree, 'sec');
+    expect(sec.metadata).toBeUndefined();
+    expect(sec.generateMetadata).toBeUndefined();
   });
 
   it('leaves nodes bare when the module exports no metadata', () => {
     const tree = parse(['./index.tsx'], resolve, () => ({}));
     expect(tree.metadata).toBeUndefined();
     expect(tree.generateMetadata).toBeUndefined();
+  });
+});
+
+describe('navigator exports', () => {
+  it('captures the navigator export of a component-less layout.ts', () => {
+    const tree = parse(
+      ['./(tabs)/layout.ts', './(tabs)/home.tsx'],
+      (key) => (key === './(tabs)/layout.ts' ? undefined : key),
+      (key) =>
+        key === './(tabs)/layout.ts' ? { navigator: { type: 'tabs' } } : {},
+    );
+    const tabs = child(tree, '(tabs)');
+    expect(tabs.navigator).toEqual({ type: 'tabs' });
+    expect(tabs.layout).toBeUndefined();
+  });
+
+  it('captures navigator and component when the layout exports both', () => {
+    const tree = parse(['./layout.tsx', './index.tsx'], resolve, (key) =>
+      key === './layout.tsx' ? { navigator: { type: 'stack' } } : {},
+    );
+    expect(tree.layout).toBe('./layout.tsx');
+    expect(tree.navigator).toEqual({ type: 'stack' });
+  });
+
+  it('throws when a layout exports neither a component nor a navigator', () => {
+    expect(() =>
+      parse(
+        ['./sec/layout.ts', './sec/index.tsx'],
+        (key) => (key === './sec/layout.ts' ? undefined : key),
+        () => ({}),
+      ),
+    ).toThrow(/layout/i);
+  });
+
+  it('throws when a page has no default export', () => {
+    expect(() =>
+      parse(['./index.tsx'], () => undefined, () => ({}))
+    ).toThrow(/default export/);
   });
 });
 
