@@ -78,7 +78,42 @@ Cierre del paso:
       y congelado de pestañas en emulador
 - [ ] `npm run typecheck && npm run lint && npm run test`
 
-## Paso 3 — Stack implícito por defecto (breaking change)
+## Paso 3 — Árbol de rutas visual en la terminal (DX)
+
+Al estilo del listado de rutas de Next.js / `npx expo-router sitemap`:
+al montar `RootRouter` en desarrollo, imprimir en la terminal de Metro el
+árbol de pantallas descubierto, con el navegador de cada carpeta y la URL
+resultante, para que el usuario vea de un vistazo qué se ha generado:
+
+```
+@jscode/react-native-routing · 6 rutas
+
+app/                          Stack (implícito)
+├── (tabs)/                   Tabs
+│   ├── index                 /            "Home"
+│   ├── profile               /profile     "Perfil"
+│   └── settings              /settings    "Ajustes"
+├── users/
+│   └── [id]                  /users/:id   (dinámica)
+└── not-found                 404          (default del paquete si falta)
+```
+
+- [ ] Formateador puro `formatRouteTree(tree) → string` en
+      `src/route-tree/` (sin React: entra dentro de la regla ESLint),
+      con tests vitest sobre el string: estáticas, `[id]`, `[...slug]`,
+      grupos, `not-found`, tipo de navegador por carpeta
+- [ ] Anotaciones por nodo: URL resuelta, tipo de navegador
+      (implícito/declarado/manual), marca de dinámica/catch-all
+- [ ] Títulos de `metadata` solo cuando ya están cargados (las pestañas
+      de un Tabs, que se leen eager); no ejecutar módulos extra solo
+      para el log
+- [ ] Trigger en `RootRouter` (jest): imprime solo en `__DEV__`, una vez
+      por montaje y al reevaluarse el árbol con Fast Refresh; prop u
+      opción para desactivarlo (`logRoutes={false}` o similar)
+- [ ] `example/`: comprobar la salida real en la terminal de Metro al
+      arrancar y al añadir/renombrar una ruta con Fast Refresh
+
+## Paso 4 — Stack implícito por defecto (breaking change)
 
 - [ ] Tests jest: carpeta sin layout → `<Stack>` implícito (hoy: paso
       directo); la raíz `app/` funciona sin `layout.tsx`
@@ -94,13 +129,13 @@ Cierre del paso:
       `navigator: { type: 'slot' }`) y bump de versión major
 - [ ] `npm run smoke` (el tarball publica los tipos nuevos)
 
-## Paso 4 — Documentación y cierre
+## Paso 5 — Documentación y cierre
 
 - [ ] Actualizar [file-conventions.md](./file-conventions.md): `layout.ts`
       como nombre reservado, stack implícito, `metadata`
 - [ ] Actualizar [api-reference.md](./api-reference.md): `ScreenMetadata`,
       `GenerateMetadata`, `NavigatorConfig`, contrato `children`,
-      precedencia
+      precedencia, prop `logRoutes` de `RootRouter`
 - [ ] Actualizar [getting-started.md](./getting-started.md) al flujo sin
       layouts manuales
 - [ ] Añadir la fase al [roadmap.md](./roadmap.md) con su checklist iOS
