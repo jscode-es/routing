@@ -6,14 +6,17 @@
 > tests y termina con verificación manual en `example/` sobre emulador
 > Android (checklist iOS pendiente de Mac, como el resto del roadmap).
 
-## Paso 0 — Cerrar decisiones abiertas del RFC
+## Paso 0 — Cerrar decisiones abiertas del RFC ✅
 
-- [ ] Nombre de la export: `metadata` vs `screenOptions`
-- [ ] Firma de `generateMetadata`: ¿solo `{ params }` o también
-      `pathname`/`segments`?
-- [ ] ¿Metadata a nivel de `layout.ts` como defaults para las hijas?
-      (puede posponerse, no bloquea)
-- [ ] Versionado: confirmar que el paso 3 (stack implícito) va en un major
+Resueltas el 2026-07-11, registradas en la sección
+[Decisiones tomadas](./rfc-metadata-layouts.md#decisiones-tomadas) del RFC:
+
+- [x] Nombre de la export: **`metadata`**
+- [x] Firma de `generateMetadata`: **`{ params, pathname, segments }`**
+- [x] Metadata a nivel de `layout.ts` como defaults para las hijas:
+      **pospuesta** (la precedencia deja hueco para añadirla después)
+- [x] Versionado: el stack implícito entra **antes del release 1.0**
+      (paquete en 0.x, sin major)
 
 ## Paso 1 — `metadata` / `generateMetadata` por página
 
@@ -126,7 +129,8 @@ app/                          Stack (implícito)
       manual completo Android (push/pop, back físico, tabs, deep link
       con `adb`, Fast Refresh)
 - [ ] Documentar la migración (quién quiera el comportamiento antiguo:
-      `navigator: { type: 'slot' }`) y bump de versión major
+      `navigator: { type: 'slot' }`); entra en 0.x antes del release 1.0,
+      sin bump major
 - [ ] `npm run smoke` (el tarball publica los tipos nuevos)
 
 ## Paso 5 — Documentación y cierre
