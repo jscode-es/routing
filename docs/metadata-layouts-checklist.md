@@ -105,7 +105,7 @@ tiene navegador propio (layout manual **o** config declarativa; slot no);
 `SlotContext` se mantiene con el subárbol directo por compatibilidad con
 `<Slot>`, y `{children}` en un layout sin config equivale al Slot de hoy.
 
-## Paso 3 — Árbol de rutas visual en la terminal (DX)
+## Paso 3 — Árbol de rutas visual en la terminal (DX) ✅
 
 Al estilo del listado de rutas de Next.js / `npx expo-router sitemap`:
 al montar `RootRouter` en desarrollo, imprimir en la terminal de Metro el
@@ -125,20 +125,21 @@ app/                          Stack (implícito)
 └── not-found                 404          (default del paquete si falta)
 ```
 
-- [ ] Formateador puro `formatRouteTree(tree) → string` en
-      `src/route-tree/` (sin React: entra dentro de la regla ESLint),
-      con tests vitest sobre el string: estáticas, `[id]`, `[...slug]`,
-      grupos, `not-found`, tipo de navegador por carpeta
-- [ ] Anotaciones por nodo: URL resuelta, tipo de navegador
-      (implícito/declarado/manual), marca de dinámica/catch-all
-- [ ] Títulos de `metadata` solo cuando ya están cargados (las pestañas
-      de un Tabs, que se leen eager); no ejecutar módulos extra solo
-      para el log
-- [ ] Trigger en `RootRouter` (jest): imprime solo en `__DEV__`, una vez
-      por montaje y al reevaluarse el árbol con Fast Refresh; prop u
-      opción para desactivarlo (`logRoutes={false}` o similar)
-- [ ] `example/`: comprobar la salida real en la terminal de Metro al
-      arrancar y al añadir/renombrar una ruta con Fast Refresh
+- [x] Formateador puro `formatRouteTree(tree) → string` en
+      `src/route-tree/format.ts` (sin React), con tests vitest:
+      estáticas, `[id]`, `[...slug]`, grupos, `not-found`, tipo de
+      navegador por carpeta
+- [x] Anotaciones por nodo: URL resuelta, tipo de navegador
+      (declarado/manual), marca de dinámica/catch-all, título de
+      `metadata` cuando existe (todos los módulos ya están cargados en
+      `buildRouteTree`, no hay coste extra)
+- [x] Trigger en `RootRouter` (jest): imprime solo en `__DEV__` vía
+      `logDev`, una vez por montaje y al reevaluarse el árbol; prop
+      `logRoutes={false}` para desactivarlo
+- [x] Verificado en dispositivo vía logcat (`ReactNativeJS`): árbol
+      completo del example con navegadores, URLs y títulos. Nota: Metro
+      ≥0.77 ya no muestra los console.log del cliente en su terminal —
+      se ven en logcat y en React Native DevTools
 
 ## Paso 4 — Stack implícito por defecto (breaking change)
 
