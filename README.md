@@ -1,113 +1,116 @@
-# @jscode/react-native-routing
+# @authuser/react-native-routing
 
-File-based router para **React Native** (iOS/Android), sin Expo ni React
-Navigation. Las rutas se definen con archivos bajo `app/`, al estilo de
-Expo Router/Next.js, sobre un motor de navegación propio construido
-directamente sobre `react-native-screens`, `react-native-gesture-handler`
-y `react-native-reanimated`.
+[![npm version](https://img.shields.io/npm/v/@authuser/react-native-routing.svg)](https://www.npmjs.com/package/@authuser/react-native-routing)
+[![CI](https://github.com/jscode-es/routing/actions/workflows/release.yml/badge.svg)](https://github.com/jscode-es/routing/actions/workflows/release.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jscode-es/routing/blob/main/LICENSE)
+
+File-based router for **React Native** (iOS/Android), without Expo or React
+Navigation. Routes are defined as files under `app/`, in the style of
+Expo Router/Next.js, on top of a navigation engine built directly on
+`react-native-screens`, `react-native-gesture-handler` and
+`react-native-reanimated`. Zero runtime dependencies.
 
 ```
 app/
-  index.tsx          → /            (stack raíz implícito, sin layouts)
+  index.tsx          → /            (implicit root stack, no layouts needed)
   users/[id].tsx     → /users/:id
   (tabs)/layout.ts   → export const navigator = { type: 'tabs' }
-  not-found.tsx      → fallback 404 (opcional)
+  not-found.tsx      → 404 fallback (optional)
 ```
 
-## Características
+## Features
 
-- Rutas por archivos: estáticas, dinámicas (`[id]`), catch-all
-  (`[...slug]`), grupos (`(group)`), layouts anidados y `not-found` (con
-  pantalla 404 por defecto si la app no la define).
-- Cero layouts obligatorios: stack nativo implícito por carpeta, tabs con
-  un `layout.ts` declarativo de una línea, y opciones de pantalla
-  colocalizadas en cada página (`export const metadata` /
-  `generateMetadata`), al estilo Next.js. Los layouts con componente
-  reciben el navegador como `children` y persisten entre pantallas.
-- Árbol de rutas visual en desarrollo: al arrancar se imprime el árbol
-  descubierto con navegadores, URLs y títulos (`logRoutes={false}` lo
-  desactiva).
-- `<Stack>` nativo (`ScreenStack`): transiciones push/pop nativas, header
-  nativo, `presentation: 'modal'`, botón físico atrás en Android,
-  swipe-to-go-back en iOS.
-- `<Tabs>` con pestañas congeladas nativamente (conservan estado) e
-  indicador animado con reanimated.
-- Navegadores anidados (sub-stacks) independientes del stack raíz.
+- File-based routes: static, dynamic (`[id]`), catch-all (`[...slug]`),
+  groups (`(group)`), nested layouts and `not-found` (with a default 404
+  screen if the app doesn't define one).
+- Zero required layouts: an implicit native stack per folder, tabs with a
+  one-line declarative `layout.ts`, and screen options co-located with each
+  page (`export const metadata` / `generateMetadata`), Next.js style.
+  Component layouts receive the navigator as `children` and persist across
+  screens.
+- Visual route tree in development: on startup the discovered tree is
+  printed with navigators, URLs and titles (`logRoutes={false}` disables it).
+- Native `<Stack>` (`ScreenStack`): native push/pop transitions, native
+  header, `presentation: 'modal'`, Android hardware back button,
+  swipe-to-go-back on iOS.
+- `<Tabs>` with natively frozen tabs (they keep their state) and an
+  animated indicator powered by reanimated.
+- Nested navigators (sub-stacks) independent from the root stack.
 - `useRouter`, `useLocalSearchParams`, `useGlobalSearchParams`,
-  `usePathname`, `useSegments`, `<Link>`, `<Slot>`, `<Redirect>` (guards
-  de auth declarativos) y router imperativo.
-- Deep linking con el módulo `Linking` del core (frío y caliente), sin
-  configuración de linking aparte: se deriva del árbol de rutas.
-- Nueva Arquitectura (Fabric) y Fast Refresh: los archivos nuevos bajo
-  `app/` se detectan sin codegen.
+  `usePathname`, `useSegments`, `<Link>`, `<Slot>`, `<Redirect>`
+  (declarative auth guards) and an imperative router.
+- Deep linking via the core `Linking` module (cold and warm starts), with
+  no separate linking configuration: it's derived from the route tree.
+- New Architecture (Fabric) and Fast Refresh: new files under `app/` are
+  picked up without codegen.
 
 ## Quick start
 
-Requiere un proyecto React Native CLI existente
-(`npx @react-native-community/cli init`); no aplica a web ni a Expo Go.
+Requires an existing React Native CLI project
+(`npx @react-native-community/cli init`); not for web or Expo Go.
 
-**1. Instala** el paquete y sus peer dependencies (no hace falta React
-Navigation ni `react-native-safe-area-context`):
+**1. Install** the package and its peer dependencies (no React Navigation
+or `react-native-safe-area-context` needed):
 
 ```sh
-npm install @jscode/react-native-routing \
+npm install @authuser/react-native-routing \
   react-native-screens react-native-gesture-handler \
   react-native-reanimated react-native-worklets
-cd ios && pod install && cd ..   # solo iOS
+cd ios && pod install && cd ..   # iOS only
 ```
 
-**2. Configura Babel y Metro** (una sola vez):
+**2. Configure Babel and Metro** (one-time setup):
 
 ```js
 // babel.config.js
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
   plugins: [
-    '@jscode/react-native-routing/babel', // acepta { root: './otro-dir' }
-    'react-native-worklets/plugin',       // siempre el último
+    '@authuser/react-native-routing/babel', // accepts { root: './other-dir' }
+    'react-native-worklets/plugin',         // always last
   ],
 };
 
 // metro.config.js
 const { getDefaultConfig } = require('@react-native/metro-config');
-const { withRouting } = require('@jscode/react-native-routing/metro');
+const { withRouting } = require('@authuser/react-native-routing/metro');
 module.exports = withRouting(getDefaultConfig(__dirname));
 ```
 
-**3. Monta el router** — sin props; el plugin de Babel localiza `app/` en
-build-time:
+**3. Mount the router** — no props needed; the Babel plugin locates `app/`
+at build time:
 
 ```tsx
 // App.tsx
-import { RootRouter } from '@jscode/react-native-routing';
+import { RootRouter } from '@authuser/react-native-routing';
 
 export default function App() {
   return <RootRouter />;
 }
 ```
 
-**4. Crea rutas.** No hace falta ningún layout: la raíz monta un stack
-nativo implícito y cada página declara sus opciones junto al componente:
+**4. Create routes.** No layout required: the root mounts an implicit
+native stack and each page declares its options next to the component:
 
 ```tsx
 // app/index.tsx  →  /
-import { Link } from '@jscode/react-native-routing';
-import type { ScreenMetadata } from '@jscode/react-native-routing';
+import { Link } from '@authuser/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 
 export const metadata: ScreenMetadata = { title: 'Home' };
 
 export default function Home() {
-  return <Link href="/users/42">Ir al usuario 42</Link>;
+  return <Link href="/users/42">Go to user 42</Link>;
 }
 ```
 
 ```tsx
-// app/users/[id].tsx  →  /users/:id, con título dinámico
+// app/users/[id].tsx  →  /users/:id, with a dynamic title
 import { Text } from 'react-native';
-import type { GenerateMetadata, PageProps } from '@jscode/react-native-routing';
+import type { GenerateMetadata, PageProps } from '@authuser/react-native-routing';
 
 export const generateMetadata: GenerateMetadata = ({ params }) => ({
-  title: `Usuario ${String(params.id)}`,
+  title: `User ${String(params.id)}`,
 });
 
 export default function User({ params }: PageProps<{ id: string }>) {
@@ -115,12 +118,11 @@ export default function User({ params }: PageProps<{ id: string }>) {
 }
 ```
 
-Toda página recibe `params` y `pathname` como props (estilo Next.js); los
-layouts también, además de `children`. Para componentes anidados que no
-reciben las props de la página están los hooks (`useLocalSearchParams`,
-`usePathname`).
+Every page receives `params` and `pathname` as props (Next.js style);
+layouts do too, plus `children`. For nested components that don't receive
+the page props there are hooks (`useLocalSearchParams`, `usePathname`).
 
-El nombre entre corchetes es libre y los segmentos dinámicos se anidan:
+The name between brackets is up to you, and dynamic segments nest:
 
 ```
 app/posts/[slug].tsx       → /posts/:slug     → params.slug
@@ -128,15 +130,15 @@ app/[category]/[item].tsx  → /:category/:item → params.category, params.item
 app/blog/[...slug].tsx     → /blog/*          → params.slug (string[])
 ```
 
-Prioridad de match: estático > dinámico > catch-all (`posts/destacado.tsx`
-gana a `posts/[slug].tsx` para `/posts/destacado`).
+Match priority: static > dynamic > catch-all (`posts/featured.tsx` beats
+`posts/[slug].tsx` for `/posts/featured`).
 
-**5. ¿Tabs?** Una carpeta con un `layout.ts` de una línea; título e icono
-salen del `metadata` de cada pestaña:
+**5. Tabs?** A folder with a one-line `layout.ts`; each tab's title and
+icon come from its page `metadata`:
 
 ```ts
 // app/(tabs)/layout.ts
-import type { NavigatorConfig } from '@jscode/react-native-routing';
+import type { NavigatorConfig } from '@authuser/react-native-routing';
 
 export const navigator: NavigatorConfig = { type: 'tabs', animation: 'fade' };
 ```
@@ -144,7 +146,7 @@ export const navigator: NavigatorConfig = { type: 'tabs', animation: 'fade' };
 ```tsx
 // app/(tabs)/profile.tsx  →  /profile
 export const metadata: ScreenMetadata = {
-  title: 'Perfil',
+  title: 'Profile',
   tab: {
     icon: ({ focused, size }) => (
       <Text style={{ fontSize: size, opacity: focused ? 1 : 0.4 }}>👤</Text>
@@ -153,29 +155,29 @@ export const metadata: ScreenMetadata = {
 };
 ```
 
-Al arrancar en desarrollo, el paquete imprime el árbol descubierto (en
+On startup in development, the package prints the discovered tree (in
 logcat / React Native DevTools):
 
 ```
-@jscode/react-native-routing · 5 rutas
+@authuser/react-native-routing · 5 routes
 
-app/                 Stack (implícito)
+app/                 Stack (implicit)
 ├── (tabs)/          Tabs
 │   ├── index        /            "Home"
-│   └── profile      /profile     "Perfil"
+│   └── profile      /profile     "Profile"
 ├── users/
-│   └── [id]         /users/:id   (dinámica)
-└── not-found        404 (default del paquete)
+│   └── [id]         /users/:id   (dynamic)
+└── not-found        404 (package default)
 ```
 
-### UI compartida y guards
+### Shared UI and guards
 
-Un layout con componente recibe el navegador de su carpeta como
-`children` (estilo Next.js) y **persiste** al navegar entre sus hijos —
-ideal para providers y guards de auth:
+A component layout receives its folder's navigator as `children`
+(Next.js style) and **persists** while navigating between its children —
+ideal for providers and auth guards:
 
 ```tsx
-// app/(tabs)/layout.tsx — convive con export const navigator
+// app/(tabs)/layout.tsx — coexists with export const navigator
 export default function TabsGuard({ children }: { children?: ReactNode }) {
   const session = useSession();
   if (!session) return <Redirect href="/login" />;
@@ -183,43 +185,33 @@ export default function TabsGuard({ children }: { children?: ReactNode }) {
 }
 ```
 
-### Navegar
+### Navigating
 
 ```tsx
-<Link href="/users/42">Perfil del 42</Link>;
+<Link href="/users/42">Profile of 42</Link>;
 
 const router = useRouter();
 router.push('/users/42');
 router.replace('/login');
 router.back();
 
-// Fuera de componentes (p. ej. un handler de push notifications):
-import { router } from '@jscode/react-native-routing';
+// Outside components (e.g. a push-notification handler):
+import { router } from '@authuser/react-native-routing';
 router.push('/messages/123');
 ```
 
-## Documentación
+## Documentation
 
-- [docs/getting-started.md](./docs/getting-started.md) — guía paso a paso
-- [docs/file-conventions.md](./docs/file-conventions.md) — convenciones de
-  archivos: rutas, grupos, layouts, stack implícito
-- [docs/api-reference.md](./docs/api-reference.md) — componentes, hooks,
-  `metadata`, `NavigatorConfig`
-- [docs/architecture.md](./docs/architecture.md) — diseño interno
+- [Getting started](https://github.com/jscode-es/routing/blob/main/docs/getting-started.md) — step-by-step guide
+- [File conventions](https://github.com/jscode-es/routing/blob/main/docs/file-conventions.md) — routes, groups, layouts, implicit stack
+- [API reference](https://github.com/jscode-es/routing/blob/main/docs/api-reference.md) — components, hooks, `metadata`, `NavigatorConfig`
+- [Architecture](https://github.com/jscode-es/routing/blob/main/docs/architecture.md) — internal design
 
-## Desarrollo
+## Contributing
 
-```sh
-npm run test:unit        # vitest (motor de rutas puro)
-npm run test:rn          # jest + RNTL (navegación)
-npm run typecheck && npm run lint
-npm run smoke            # npm pack + instalación del tarball
-npm run example:android  # app de ejemplo en emulador
-```
+Source code, issues and development setup live at
+[github.com/jscode-es/routing](https://github.com/jscode-es/routing).
 
-Estado del proyecto por fases en [docs/roadmap.md](./docs/roadmap.md).
-La verificación en iOS está pendiente de hardware (ver roadmap).
+## License
 
-## Licencia
-
-[MIT](./LICENSE)
+[MIT](https://github.com/jscode-es/routing/blob/main/LICENSE)
