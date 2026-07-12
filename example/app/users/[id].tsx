@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import type {
   GenerateMetadata,
   PageProps,
-} from '@jscode/react-native-routing';
+} from '@authuser/react-native-routing';
 
 export const generateMetadata: GenerateMetadata = ({ params }) => ({
   title: `Usuario ${String(params.id)}`,

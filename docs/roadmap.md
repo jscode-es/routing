@@ -45,7 +45,7 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
 - Metro no funciona bien desde la unidad `subst` (mezcla `V:`/`F:` en el
   Haste map) → **Gradle desde `V:`, Metro desde `F:`**.
 - npm workspaces no enlaza el paquete raíz como dependencia de `example/`
-  → se usa `"@jscode/react-native-routing": "file:.."`.
+  → se usa `"@authuser/react-native-routing": "file:.."`.
 - Los paths de Gradle del template asumen `example/node_modules` → se
   apuntan al `node_modules` raíz (hoisting): `settings.gradle` y el bloque
   `react {}` de `app/build.gradle`.
@@ -193,7 +193,7 @@ cae en `not-found`.
 
 - [x] TDD: `babel/plugin.test.ts` (vitest), `app-context.test.ts`,
       fallback y error claro en `RootRouter.test.tsx`
-- [x] Plugin de Babel `@jscode/react-native-routing/babel` (JS plano, como
+- [x] Plugin de Babel `@authuser/react-native-routing/babel` (JS plano, como
       el helper de Metro): inyecta `require.context` en el placeholder
       `getAppContext()` de `src/route-tree/app-context.ts`, con path
       relativo calculado desde ese módulo hasta el directorio de rutas

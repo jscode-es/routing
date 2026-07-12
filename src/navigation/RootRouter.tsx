@@ -26,7 +26,7 @@ export function RootRouter({
     const ctx = context ?? getAppContext();
     if (!ctx) {
       throw new Error(
-        'RootRouter has no route context. Add "@jscode/react-native-routing/babel" ' +
+        'RootRouter has no route context. Add "@authuser/react-native-routing/babel" ' +
           'to the plugins of babel.config.js (routes are read from ./app), or pass ' +
           "the context prop: <RootRouter context={require.context('./app', true, /\\.[jt]sx?$/)} />",
       );

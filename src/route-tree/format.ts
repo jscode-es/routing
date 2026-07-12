@@ -130,5 +130,5 @@ export function formatRouteTree(tree: RouteNode): string {
     .join('\n');
 
   const label = routeCount === 1 ? 'ruta' : 'rutas';
-  return `@jscode/react-native-routing · ${routeCount} ${label}\n\n${body}`;
+  return `@authuser/react-native-routing · ${routeCount} ${label}\n\n${body}`;
 }

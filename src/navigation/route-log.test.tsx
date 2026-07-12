@@ -40,7 +40,7 @@ describe('route tree log', () => {
   it('prints the route tree once on mount in development', async () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
     const calls = logSpy.mock.calls.filter(([message]) =>
-      String(message).includes('@jscode/react-native-routing'),
+      String(message).includes('@authuser/react-native-routing'),
     );
     expect(calls).toHaveLength(1);
     const output = String(calls[0]?.[0]);

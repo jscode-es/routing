@@ -35,7 +35,7 @@ function demoTree() {
 describe('formatRouteTree', () => {
   it('prints the header with the route count', () => {
     const output = formatRouteTree(demoTree());
-    expect(output).toContain('@jscode/react-native-routing');
+    expect(output).toContain('@authuser/react-native-routing');
     expect(output).toContain('4 rutas');
   });
 

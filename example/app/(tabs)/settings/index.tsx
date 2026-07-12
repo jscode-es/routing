@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Link } from '@jscode/react-native-routing';
-import type { ScreenMetadata } from '@jscode/react-native-routing';
+import { Link } from '@authuser/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 
 // title alimenta a la vez la pestaña y el header del sub-stack; el icono
 // de la pestaña de una carpeta sale del metadata de su index.

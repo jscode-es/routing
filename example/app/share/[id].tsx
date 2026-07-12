@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useLocalSearchParams } from '@jscode/react-native-routing';
+import { useLocalSearchParams } from '@authuser/react-native-routing';
 
 export default function Share() {
   const { id } = useLocalSearchParams<{ id: string }>();

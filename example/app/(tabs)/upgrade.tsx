@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from '@jscode/react-native-routing';
-import type { ScreenMetadata } from '@jscode/react-native-routing';
+import { useRouter } from '@authuser/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 import { setPremium } from '../../auth';
 
 export const metadata: ScreenMetadata = {

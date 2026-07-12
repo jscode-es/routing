@@ -41,7 +41,7 @@ opciones que hoy aceptan `Stack.Screen` y `Tabs.Screen`:
 
 ```tsx
 // app/(tabs)/profile.tsx
-import type { ScreenMetadata } from '@jscode/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 
 export const metadata: ScreenMetadata = {
   title: 'Perfil',
@@ -135,7 +135,7 @@ caso común. La propuesta:
 
 ```ts
 // app/(tabs)/layout.ts
-import type { NavigatorConfig } from '@jscode/react-native-routing';
+import type { NavigatorConfig } from '@authuser/react-native-routing';
 
 export const navigator: NavigatorConfig = {
   type: 'tabs',

@@ -7,7 +7,7 @@
 ## 1. Instalar
 
 ```sh
-npm install @jscode/react-native-routing \
+npm install @authuser/react-native-routing \
   react-native-screens react-native-gesture-handler \
   react-native-reanimated react-native-worklets
 ```
@@ -26,7 +26,7 @@ Tras instalar, en iOS hace falta instalar los pods nativos:
 cd ios && pod install && cd ..
 ```
 
-(Sustituye `@jscode/react-native-routing` por el nombre final del
+(Sustituye `@authuser/react-native-routing` por el nombre final del
 paquete una vez publicado.)
 
 ## 2. Configurar Babel
@@ -40,7 +40,7 @@ directorio `app/`, sin pasarle nada) y el de `react-native-worklets`, que
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
   plugins: [
-    '@jscode/react-native-routing/babel',
+    '@authuser/react-native-routing/babel',
     'react-native-worklets/plugin', // siempre el último
   ],
 };
@@ -51,7 +51,7 @@ proyecto); para otro directorio, pasa la opción `root`:
 
 ```js
 plugins: [
-  ['@jscode/react-native-routing/babel', { root: './src/routes' }],
+  ['@authuser/react-native-routing/babel', { root: './src/routes' }],
   'react-native-worklets/plugin',
 ],
 ```
@@ -61,7 +61,7 @@ plugins: [
 ```js
 // metro.config.js
 const { getDefaultConfig } = require('@react-native/metro-config');
-const { withRouting } = require('@jscode/react-native-routing/metro');
+const { withRouting } = require('@authuser/react-native-routing/metro');
 
 module.exports = withRouting(getDefaultConfig(__dirname));
 ```
@@ -89,7 +89,7 @@ AppRegistry.registerComponent(appName, () => App);
 
 ```tsx
 // App.tsx
-import { RootRouter } from '@jscode/react-native-routing';
+import { RootRouter } from '@authuser/react-native-routing';
 
 export default function App() {
   return <RootRouter />;
@@ -122,8 +122,8 @@ app/
 
 ```tsx
 // app/index.tsx
-import { Link } from '@jscode/react-native-routing';
-import type { ScreenMetadata } from '@jscode/react-native-routing';
+import { Link } from '@authuser/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 
 export const metadata: ScreenMetadata = { title: 'Home' };
 
@@ -135,7 +135,7 @@ export default function Home() {
 ```tsx
 // app/users/[id].tsx
 import { Text } from 'react-native';
-import type { GenerateMetadata, PageProps } from '@jscode/react-native-routing';
+import type { GenerateMetadata, PageProps } from '@authuser/react-native-routing';
 
 export const generateMetadata: GenerateMetadata = ({ params }) => ({
   title: `Usuario ${String(params.id)}`,

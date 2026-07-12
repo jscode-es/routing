@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { Link } from '@jscode/react-native-routing';
-import type { ScreenMetadata } from '@jscode/react-native-routing';
+import { Link } from '@authuser/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 
 export const metadata: ScreenMetadata = {
   title: 'Home',

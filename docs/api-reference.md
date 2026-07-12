@@ -34,7 +34,7 @@ y `pathname` como props, al estilo de Next.js:
 
 ```tsx
 // app/users/[id].tsx
-import type { PageProps } from '@jscode/react-native-routing';
+import type { PageProps } from '@authuser/react-native-routing';
 
 export default function User({ params, pathname }: PageProps<{ id: string }>) {
   return <Text>{`User ${params.id} (${pathname})`}</Text>;
@@ -60,7 +60,7 @@ componente — la fuente primaria de configuración (los `<Stack.Screen>`/
 
 ```tsx
 // app/(tabs)/profile.tsx
-import type { ScreenMetadata } from '@jscode/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 
 export const metadata: ScreenMetadata = {
   title: 'Perfil',
@@ -84,7 +84,7 @@ estática:
 
 ```tsx
 // app/users/[id].tsx
-import type { GenerateMetadata } from '@jscode/react-native-routing';
+import type { GenerateMetadata } from '@authuser/react-native-routing';
 
 export const generateMetadata: GenerateMetadata = ({ params, pathname, segments }) => ({
   title: `Usuario ${String(params.id)}`,
@@ -109,7 +109,7 @@ Una carpeta cambia su navegador exportando `navigator` desde su archivo
 
 ```ts
 // app/(tabs)/layout.ts
-import type { NavigatorConfig } from '@jscode/react-native-routing';
+import type { NavigatorConfig } from '@authuser/react-native-routing';
 
 export const navigator: NavigatorConfig = {
   type: 'tabs',      // 'stack' | 'tabs' | 'slot'
@@ -336,7 +336,7 @@ layout según qué grupo esté activo (por ejemplo, `(auth)` frente a
 ejemplo en un handler de push notifications):
 
 ```ts
-import { router } from '@jscode/react-native-routing';
+import { router } from '@authuser/react-native-routing';
 router.push('/messages/123');
 ```
 

@@ -43,7 +43,7 @@ propio del paquete:
 
 ```js
 // metro.config.js
-const { withRouting } = require('@jscode/react-native-routing/metro');
+const { withRouting } = require('@authuser/react-native-routing/metro');
 const { getDefaultConfig } = require('@react-native/metro-config');
 
 module.exports = withRouting(getDefaultConfig(__dirname));
@@ -55,7 +55,7 @@ Metro exige que el path de `require.context` sea un string literal
 resoluble en build-time relativo al módulo que lo contiene, y el código
 del paquete vive en `node_modules`, desde donde no conoce a priori el
 `app/` del proyecto. El paquete lo resuelve con un plugin de Babel propio
-(`@jscode/react-native-routing/babel`, mismo enfoque que Expo Router): el
+(`@authuser/react-native-routing/babel`, mismo enfoque que Expo Router): el
 módulo `src/route-tree/app-context.ts` contiene un placeholder
 (`getAppContext()` devuelve `null`) y el plugin lo reemplaza en
 build-time por un `require.context` con el path relativo calculado desde

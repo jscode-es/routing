@@ -35,7 +35,7 @@ que en Next.js):
 
 ```tsx
 // app/users/[id].tsx
-import type { PageProps } from '@jscode/react-native-routing';
+import type { PageProps } from '@authuser/react-native-routing';
 
 export default function UserScreen({ params }: PageProps<{ id: string }>) {
   return <Text>User {params.id}</Text>;
@@ -102,7 +102,7 @@ exportar dos cosas, juntas o por separado:
 
 ```ts
 // app/(tabs)/layout.ts
-import type { NavigatorConfig } from '@jscode/react-native-routing';
+import type { NavigatorConfig } from '@authuser/react-native-routing';
 
 export const navigator: NavigatorConfig = { type: 'tabs', animation: 'fade' };
 ```

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs } from '@jscode/react-native-routing';
+import { Tabs } from '@authuser/react-native-routing';
 import { usePremium } from '../../auth';
 
 // Título e icono de cada pestaña salen del export metadata de su página.
