@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { usePathname } from '@jscode/react-native-routing';
+import { usePathname } from '@authuser/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
+
+export const metadata: ScreenMetadata = { title: 'Detalle de ajustes' };
 
 export default function SettingsDetails() {
   const pathname = usePathname();

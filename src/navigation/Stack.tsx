@@ -14,9 +14,12 @@ import {
   EntryContext,
   EntrySubtree,
   TopInsetHandledContext,
+  useNavigatorMountGuard,
   useRouterState,
 } from './RouterContext';
 import { useRouter } from './hooks';
+import { entryMetadata } from './metadata';
+import { createsNavigator } from './navigator-config';
 import type { NavigationEntry } from './reducer';
 import {
   collectScreenConfigs,
@@ -38,9 +41,10 @@ interface ScreenGroup {
   child: RouteNode | undefined;
 }
 
-// Las entradas consecutivas cuyo hijo directo tiene su propio layout
-// comparten Screen: ese subárbol monta un navegador anidado que gestiona
-// sus propias pantallas (el push entra al stack interior, no al exterior).
+// Las entradas consecutivas cuyo hijo directo tiene navegador propio
+// (layout manual o config declarativa) comparten Screen: ese subárbol
+// monta un navegador anidado que gestiona sus propias pantallas (el push
+// entra al stack interior, no al exterior).
 function groupEntries(
   entries: NavigationEntry[],
   layoutDepth: number,
@@ -53,7 +57,7 @@ function groupEntries(
       last &&
       child !== undefined &&
       last.child === child &&
-      child.layout !== undefined
+      createsNavigator(child)
     ) {
       last.entries.push(entry);
     } else {
@@ -73,6 +77,7 @@ function StackComponent({
   const parentEntry = useContext(EntryContext);
   const topInsetHandled = useContext(TopInsetHandledContext);
   const api = useRouter();
+  useNavigatorMountGuard();
   const configs = collectScreenConfigs(children);
 
   // El nodo del propio layout se lee de la entrada bajo la que se renderiza
@@ -107,8 +112,20 @@ function StackComponent({
       {groups.map((group, index) => {
         const entry = group.entries[group.entries.length - 1]!;
         const name = screenNameForEntry(entry, layoutDepth);
-        const options = configs[name] ?? {};
-        const headerShown = options.headerShown !== false;
+        // La metadata de la página aplica cuando este stack presenta la hoja
+        // directamente; con un layout anidado el grupo comparte Screen y las
+        // opciones del interior no se filtran al Screen exterior.
+        const leaf = entry.match.chain[entry.match.chain.length - 1];
+        const nestedNavigator =
+          group.child !== undefined && createsNavigator(group.child);
+        const meta =
+          !nestedNavigator && leaf ? entryMetadata(leaf, entry) : {};
+        const options = { ...meta, ...configs[name] };
+        // La pantalla de un navegador anidado no muestra header por defecto:
+        // el navegador interior gestiona los suyos.
+        const headerShown = nestedNavigator
+          ? options.headerShown === true
+          : options.headerShown !== false;
         const wantsSafeArea =
           !headerShown && options.safeArea !== false && !topInsetHandled;
         const content = (

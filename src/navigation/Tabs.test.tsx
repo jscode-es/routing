@@ -42,8 +42,9 @@ describe('Tabs', () => {
   it('mounts every tab in its own Screen, active one in foreground', async () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
     const screens = screen.getAllByTestId('screen');
-    expect(screens).toHaveLength(2);
-    expect(screens.map((s) => s.props.activityState)).toEqual([2, 0]);
+    // La primera pantalla es la del grupo (tabs) en el stack raíz implícito.
+    expect(screens).toHaveLength(3);
+    expect(screens.map((s) => s.props.activityState)).toEqual([2, 2, 0]);
     expect(screen.getByText('Count 0')).toBeTruthy();
     expect(screen.getByText('Profile screen')).toBeTruthy();
   });
@@ -67,7 +68,7 @@ describe('Tabs', () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
     await fireEvent.press(screen.getByTestId('tab-profile'));
     const screens = screen.getAllByTestId('screen');
-    expect(screens.map((s) => s.props.activityState)).toEqual([0, 2]);
+    expect(screens.map((s) => s.props.activityState)).toEqual([2, 0, 2]);
   });
 
   it('keeps local tab state when switching back and forth', async () => {
@@ -81,6 +82,33 @@ describe('Tabs', () => {
     expect(screen.getByText('Count 2')).toBeTruthy();
   });
 
+  it('toggles tab visibility dynamically with the hidden prop', async () => {
+    const Layout = () => {
+      const [premium, setPremium] = useState(false);
+      return (
+        <>
+          <Pressable testID="toggle" onPress={() => setPremium((p) => !p)}>
+            <Text>toggle</Text>
+          </Pressable>
+          <Tabs hidden={premium ? ['upgrade'] : ['premium']} />
+        </>
+      );
+    };
+    const ctx = fakeContext({
+      './(tabs)/layout.tsx': Layout,
+      './(tabs)/home.tsx': Home,
+      './(tabs)/premium.tsx': () => <Text>Premium screen</Text>,
+      './(tabs)/upgrade.tsx': () => <Text>Upgrade screen</Text>,
+    });
+    await render(<RootRouter context={ctx} initialPath="/home" />);
+    expect(screen.getByTestId('tab-upgrade')).toBeTruthy();
+    expect(screen.queryByTestId('tab-premium')).toBeNull();
+
+    await fireEvent.press(screen.getByTestId('toggle'));
+    expect(screen.getByTestId('tab-premium')).toBeTruthy();
+    expect(screen.queryByTestId('tab-upgrade')).toBeNull();
+  });
+
   it('renders the animated indicator', async () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
     expect(screen.getByTestId('tab-indicator')).toBeTruthy();
@@ -88,8 +116,12 @@ describe('Tabs', () => {
 
   it('wraps the tab bar in a bottom safe area', async () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
-    const safeArea = screen.getByTestId('safe-area');
-    expect(safeArea.props.edges).toEqual({ bottom: true });
+    const safeAreas = screen.getAllByTestId('safe-area');
+    // La superior la aplica la pantalla sin header del stack raíz implícito.
+    expect(safeAreas.map((s) => s.props.edges)).toEqual([
+      { top: true },
+      { bottom: true },
+    ]);
     expect(screen.getByTestId('tab-home')).toBeTruthy();
   });
 

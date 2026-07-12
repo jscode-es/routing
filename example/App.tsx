@@ -1,5 +1,5 @@
 import React from 'react';
-import { RootRouter } from '@jscode/react-native-routing';
+import { RootRouter } from '@authuser/react-native-routing';
 
 export default function App() {
   return <RootRouter />;

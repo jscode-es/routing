@@ -1,12 +1,18 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useLocalSearchParams } from '@jscode/react-native-routing';
+import type {
+  GenerateMetadata,
+  PageProps,
+} from '@authuser/react-native-routing';
 
-export default function User() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+export const generateMetadata: GenerateMetadata = ({ params }) => ({
+  title: `Usuario ${String(params.id)}`,
+});
+
+export default function User({ params }: PageProps<{ id: string }>) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>User {id}</Text>
+      <Text style={styles.title}>User {params.id}</Text>
     </View>
   );
 }

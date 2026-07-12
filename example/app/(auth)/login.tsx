@@ -1,7 +1,13 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useRouter } from '@jscode/react-native-routing';
+import { useRouter } from '@authuser/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 import { setSession } from '../../auth';
+
+export const metadata: ScreenMetadata = {
+  title: 'Login',
+  headerShown: false,
+};
 
 export default function Login() {
   const router = useRouter();

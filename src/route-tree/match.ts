@@ -100,6 +100,9 @@ export function matchNotFound<C>(
     segment: 'not-found',
     type: 'static',
     component,
+    ...(tree.notFoundMetadata !== undefined
+      ? { metadata: tree.notFoundMetadata }
+      : {}),
     children: [],
   };
   return { node, params: {}, chain: [tree, node] };

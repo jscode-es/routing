@@ -13,7 +13,7 @@ module.exports = function routingBabelPlugin({ types: t }, options = {}) {
   const root = options.root || './app';
 
   return {
-    name: '@jscode/react-native-routing/babel',
+    name: '@authuser/react-native-routing/babel',
     visitor: {
       FunctionDeclaration(fnPath, state) {
         if (!fnPath.node.id || fnPath.node.id.name !== 'getAppContext') return;

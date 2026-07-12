@@ -137,6 +137,86 @@ describe('parse', () => {
   });
 });
 
+describe('metadata exports', () => {
+  const gen = () => ({});
+
+  it('captures metadata and generateMetadata on page nodes', () => {
+    const tree = parse(['./index.tsx', './users/[id].tsx'], resolve, (key) => ({
+      metadata: { title: key },
+      generateMetadata: gen,
+    }));
+    expect(tree.metadata).toEqual({ title: './index.tsx' });
+    expect(tree.generateMetadata).toBe(gen);
+    const id = child(child(tree, 'users'), '[id]');
+    expect(id.metadata).toEqual({ title: './users/[id].tsx' });
+    expect(id.generateMetadata).toBe(gen);
+  });
+
+  it('does not attach metadata from layout or not-found exports', () => {
+    const tree = parse(
+      ['./sec/layout.tsx', './sec/not-found.tsx', './sec/index.tsx'],
+      resolve,
+      (key) =>
+        key === './sec/index.tsx' ? {} : { metadata: { title: 'X' } },
+    );
+    const sec = child(tree, 'sec');
+    expect(sec.metadata).toBeUndefined();
+    expect(sec.generateMetadata).toBeUndefined();
+  });
+
+  it('captures the not-found metadata aside for the virtual leaf', () => {
+    const tree = parse(['./not-found.tsx', './index.tsx'], resolve, (key) =>
+      key === './not-found.tsx' ? { metadata: { title: '404' } } : {},
+    );
+    expect(tree.notFoundMetadata).toEqual({ title: '404' });
+    expect(tree.metadata).toBeUndefined();
+  });
+
+  it('leaves nodes bare when the module exports no metadata', () => {
+    const tree = parse(['./index.tsx'], resolve, () => ({}));
+    expect(tree.metadata).toBeUndefined();
+    expect(tree.generateMetadata).toBeUndefined();
+  });
+});
+
+describe('navigator exports', () => {
+  it('captures the navigator export of a component-less layout.ts', () => {
+    const tree = parse(
+      ['./(tabs)/layout.ts', './(tabs)/home.tsx'],
+      (key) => (key === './(tabs)/layout.ts' ? undefined : key),
+      (key) =>
+        key === './(tabs)/layout.ts' ? { navigator: { type: 'tabs' } } : {},
+    );
+    const tabs = child(tree, '(tabs)');
+    expect(tabs.navigator).toEqual({ type: 'tabs' });
+    expect(tabs.layout).toBeUndefined();
+  });
+
+  it('captures navigator and component when the layout exports both', () => {
+    const tree = parse(['./layout.tsx', './index.tsx'], resolve, (key) =>
+      key === './layout.tsx' ? { navigator: { type: 'stack' } } : {},
+    );
+    expect(tree.layout).toBe('./layout.tsx');
+    expect(tree.navigator).toEqual({ type: 'stack' });
+  });
+
+  it('throws when a layout exports neither a component nor a navigator', () => {
+    expect(() =>
+      parse(
+        ['./sec/layout.ts', './sec/index.tsx'],
+        (key) => (key === './sec/layout.ts' ? undefined : key),
+        () => ({}),
+      ),
+    ).toThrow(/layout/i);
+  });
+
+  it('throws when a page has no default export', () => {
+    expect(() =>
+      parse(['./index.tsx'], () => undefined, () => ({}))
+    ).toThrow(/default export/);
+  });
+});
+
 describe('deep nesting', () => {
   it('builds three levels of folders with layouts at each level', () => {
     const tree = parse(

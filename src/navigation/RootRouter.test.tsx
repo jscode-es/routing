@@ -85,6 +85,6 @@ describe('RootRouter without context prop', () => {
     } finally {
       consoleError.mockRestore();
     }
-    expect(String(error)).toContain('@jscode/react-native-routing/babel');
+    expect(String(error)).toContain('@authuser/react-native-routing/babel');
   });
 });

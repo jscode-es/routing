@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Qué es
 
-`@jscode/react-native-routing`: file-based router para React Native puro (sin Expo ni React Navigation). El árbol de rutas y la orquestación de navegación son código propio; solo se apoya en `react-native-screens`, `react-native-gesture-handler` y `react-native-reanimated` como peer dependencies (cero dependencias runtime). Fuera de alcance: web/React DOM.
+`@authuser/react-native-routing`: file-based router para React Native puro (sin Expo ni React Navigation). El árbol de rutas y la orquestación de navegación son código propio; solo se apoya en `react-native-screens`, `react-native-gesture-handler` y `react-native-reanimated` como peer dependencies (cero dependencias runtime). Fuera de alcance: web/React DOM.
 
 Docs en `docs/` (leer antes de implementar una feature): `architecture.md` (diseño interno), `file-conventions.md` (notación de rutas), `api-reference.md` (API pública), `roadmap.md` (fases TDD, estado actual y notas técnicas resueltas), `getting-started.md`.
 
@@ -47,7 +47,7 @@ Tres capas:
 Piezas con restricciones no obvias:
 
 - `metro/withRouting.js` y `babel/plugin.js` son **JS plano, sin build**: los ejecuta Node directamente desde `metro.config.js`/`babel.config.js` de la app consumidora. No convertir a TS.
-- `<RootRouter />` sin props funciona porque el plugin de Babel (`@jscode/react-native-routing/babel`) reemplaza el `return null` de `getAppContext()` (`src/route-tree/app-context.ts`) por un `require.context` con path relativo al directorio de rutas (opción `root`, default `./app`). El placeholder devuelve `null` (y no un `require.context` con env var) para que sin plugin no haya error de build de Metro, solo un error de runtime claro; el prop `context` sigue siendo el escape hatch.
+- `<RootRouter />` sin props funciona porque el plugin de Babel (`@authuser/react-native-routing/babel`) reemplaza el `return null` de `getAppContext()` (`src/route-tree/app-context.ts`) por un `require.context` con path relativo al directorio de rutas (opción `root`, default `./app`). El placeholder devuelve `null` (y no un `require.context` con env var) para que sin plugin no haya error de build de Metro, solo un error de runtime claro; el prop `context` sigue siendo el escape hatch.
 - Export map dual: la condición `react-native` resuelve `src/index.ts` (Metro + Fast Refresh directo sobre el código fuente); npm/Node consumen `dist/`. `files` publica `dist`, `metro` y `src`.
 - `not-found` no es un nodo del árbol: `parse` lo guarda en `root.notFound` y `matchNotFound` fabrica una hoja virtual; hay `DefaultNotFound` si la app no define el suyo.
 - Dentro de un `ScreenStack` el `activityState` no puede decrecer (crashea en nativo): las pantallas van siempre a 2 y el congelado se expresa con `freezeOnBlur`/`shouldFreeze`. El contenido con header nativo va en `ScreenContentWrapper` y el `Screen` usa `absoluteFill` (no `flex: 1`).

@@ -27,4 +27,19 @@ describe('buildRouteTree', () => {
     const ctx = fakeContext({ './broken.tsx': undefined });
     expect(() => buildRouteTree(ctx)).toThrow(/default export/);
   });
+
+  it('accepts a component-less layout that exports a navigator config', () => {
+    const Home = () => null;
+    const modules: Record<string, Record<string, unknown>> = {
+      './layout.ts': { navigator: { type: 'stack' } },
+      './index.tsx': { default: Home },
+    };
+    const ctx = ((key: string) => modules[key]!) as RequireContext;
+    ctx.keys = () => Object.keys(modules);
+
+    const tree = buildRouteTree(ctx);
+    expect(tree.navigator).toEqual({ type: 'stack' });
+    expect(tree.layout).toBeUndefined();
+    expect(tree.component).toBe(Home);
+  });
 });

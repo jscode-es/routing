@@ -45,7 +45,7 @@ Notas de entorno (Windows) que quedaron resueltas aquí:
 - Metro no funciona bien desde la unidad `subst` (mezcla `V:`/`F:` en el
   Haste map) → **Gradle desde `V:`, Metro desde `F:`**.
 - npm workspaces no enlaza el paquete raíz como dependencia de `example/`
-  → se usa `"@jscode/react-native-routing": "file:.."`.
+  → se usa `"@authuser/react-native-routing": "file:.."`.
 - Los paths de Gradle del template asumen `example/node_modules` → se
   apuntan al `node_modules` raíz (hoisting): `settings.gradle` y el bloque
   `react {}` de `app/build.gradle`.
@@ -193,7 +193,7 @@ cae en `not-found`.
 
 - [x] TDD: `babel/plugin.test.ts` (vitest), `app-context.test.ts`,
       fallback y error claro en `RootRouter.test.tsx`
-- [x] Plugin de Babel `@jscode/react-native-routing/babel` (JS plano, como
+- [x] Plugin de Babel `@authuser/react-native-routing/babel` (JS plano, como
       el helper de Metro): inyecta `require.context` en el placeholder
       `getAppContext()` de `src/route-tree/app-context.ts`, con path
       relativo calculado desde ese módulo hasta el directorio de rutas
@@ -212,6 +212,33 @@ Notas: el placeholder devuelve `null` en vez de contener un
 plugin no rompa el build de Metro (un `require.context` con argumento
 no-literal es error de build); sin plugin el fallo es un error de runtime
 claro al montar `RootRouter`.
+
+## Fase 10 — Metadata por página y navegadores inferidos ✅ (breaking)
+
+Implementación del RFC [rfc-metadata-layouts.md](./rfc-metadata-layouts.md)
+en cuatro pasos TDD, todos verificados en emulador Android:
+
+- [x] `export const metadata` / `generateMetadata({ params, pathname,
+      segments })` por página, con precedencia defaults < metadata <
+      generateMetadata < `Screen options` explícitas; exports opcionales
+      y tolerantes a malformación (warning solo en dev). `not-found.tsx`
+      también acepta `metadata`
+- [x] `layout.ts` declarativo (`export const navigator: NavigatorConfig`)
+      y contrato `children` estilo Next.js en los layouts con componente
+      (persisten al navegar; aviso en dev si un layout monta navegador
+      propio y `children` a la vez)
+- [x] Árbol de rutas visual en desarrollo (`formatRouteTree` +
+      `logRoutes` en `RootRouter`)
+- [x] **Breaking**: stack implícito por defecto — raíz siempre, y toda
+      carpeta con más de una entrada navegable; carpeta de una sola hoja
+      queda en el stack ancestro; header exterior oculto por defecto
+      sobre navegadores anidados. El comportamiento anterior (paso
+      directo) se recupera con `navigator: { type: 'slot' }`. Entra en
+      0.x antes del release 1.0, sin major
+- [x] `npm run smoke`
+- [ ] **Checklist iOS (pendiente de Mac)**: paridad del checklist manual
+      Android de esta fase (tabs declarativas, metadata en headers,
+      modal OTT, stack implícito)
 
 ---
 

@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
 import { execSync } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const root = process.cwd();
+const pkgName = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).name;
 
 execSync('npm run build', { stdio: 'inherit', cwd: root });
 const packOutput = execSync('npm pack --silent', { cwd: root })
@@ -25,10 +26,10 @@ try {
   const require = createRequire(join(workDir, 'index.js'));
 
   // Entry principal: solo resolución (ejecutarlo requiere react-native).
-  const mainPath = require.resolve('@jscode/react-native-routing');
+  const mainPath = require.resolve(pkgName);
   assert.ok(mainPath.endsWith('index.js'), `unexpected main entry ${mainPath}`);
 
-  const pkgDir = join(workDir, 'node_modules', '@jscode', 'react-native-routing');
+  const pkgDir = join(workDir, 'node_modules', ...pkgName.split('/'));
   assert.ok(
     existsSync(join(pkgDir, 'dist', 'index.d.ts')),
     'dist/index.d.ts missing from the tarball',
@@ -40,13 +41,13 @@ try {
   );
 
   // Helper de metro: JS plano, ejecutable en Node.
-  const { withRouting } = require('@jscode/react-native-routing/metro');
+  const { withRouting } = require(`${pkgName}/metro`);
   const config = withRouting({ transformer: { keepMe: true } });
   assert.equal(config.transformer.unstable_allowRequireContext, true);
   assert.equal(config.transformer.keepMe, true);
 
   // Plugin de babel: JS plano, ejecutable en Node.
-  const routingBabel = require('@jscode/react-native-routing/babel');
+  const routingBabel = require(`${pkgName}/babel`);
   const plugin = routingBabel({ types: {} });
   assert.equal(typeof plugin.visitor.FunctionDeclaration, 'function');
 

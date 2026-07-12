@@ -1,9 +1,15 @@
 # RFC: metadata por pantalla y navegadores inferidos
 
-> **Estado: propuesta, sin implementar.** Este documento plantea el diseño;
-> no describe comportamiento actual del paquete. Para la API vigente ver
-> [api-reference.md](./api-reference.md) y
-> [file-conventions.md](./file-conventions.md).
+> **Estado: implementado** (Fase 10 del [roadmap](./roadmap.md), julio
+> 2026). Se conserva como registro de diseño y de las decisiones tomadas;
+> la documentación vigente está en [api-reference.md](./api-reference.md)
+> y [file-conventions.md](./file-conventions.md). Diferencias menores
+> respecto al texto original: la lectura de metadata resultó de coste
+> cero también en Stack (los módulos ya se ejecutan al construir el
+> árbol), `not-found.tsx` también acepta `metadata`, y el stack implícito
+> aplica además a cualquier carpeta con más de una entrada navegable (no
+> solo a la raíz), con header exterior oculto por defecto sobre
+> navegadores anidados.
 
 ## Motivación
 
@@ -35,7 +41,7 @@ opciones que hoy aceptan `Stack.Screen` y `Tabs.Screen`:
 
 ```tsx
 // app/(tabs)/profile.tsx
-import type { ScreenMetadata } from '@jscode/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 
 export const metadata: ScreenMetadata = {
   title: 'Perfil',
@@ -94,8 +100,8 @@ pantalla cae a los defaults.
 
 Nota sobre el nombre: `metadata` sigue el modelo mental de Next.js. La
 alternativa `screenOptions` es más literal (son opciones de comportamiento,
-no metadatos de documento), pero pierde la familiaridad. Decisión abierta;
-el resto del documento usa `metadata`.
+no metadatos de documento), pero pierde la familiaridad. **Decidido:
+`metadata`** (ver [Decisiones tomadas](#decisiones-tomadas)).
 
 #### Metadata dinámica
 
@@ -109,8 +115,9 @@ export const generateMetadata: GenerateMetadata = ({ params }) => ({
 });
 ```
 
-Se evalúa al resolver la entrada de navegación (push/deep link), con los
-params ya extraídos por el matcher. Si coexisten `metadata` y
+Se evalúa al resolver la entrada de navegación (push/deep link). Recibe
+`{ params, pathname, segments }` — los tres ya los tiene el matcher al
+resolver, exponerlos es gratis y evita cambiar la firma más adelante. Si coexisten `metadata` y
 `generateMetadata`, la función recibe la estática como base y su resultado
 se mezcla encima. Es síncrona: para títulos que dependen de datos remotos
 ya existe `router.setParams` / estado propio — fuera de alcance aquí.
@@ -128,7 +135,7 @@ caso común. La propuesta:
 
 ```ts
 // app/(tabs)/layout.ts
-import type { NavigatorConfig } from '@jscode/react-native-routing';
+import type { NavigatorConfig } from '@authuser/react-native-routing';
 
 export const navigator: NavigatorConfig = {
   type: 'tabs',
@@ -310,7 +317,9 @@ El árbol de `parse` seguiría siendo puro; la lectura de metadata ocurre en
 
 ## Encaje en el roadmap
 
-Encajaría como una fase nueva (post-1.0) en tres pasos TDD:
+Encajaría como una fase nueva **antes del release 1.0** (el paquete está
+en 0.x; semver permite breaking changes en minor y así el 1.0 nace con el
+modelo definitivo), en tres pasos TDD:
 
 1. **Lectura de `metadata`/`generateMetadata`** y mezcla de precedencias en
    Stack y Tabs existentes (tests jest sobre `src/navigation/`).
@@ -321,13 +330,19 @@ Encajaría como una fase nueva (post-1.0) en tres pasos TDD:
 3. **Stack implícito por defecto** — el breaking change, al final, con la
    migración documentada y verificación manual en `example/`.
 
-## Preguntas abiertas
+## Decisiones tomadas
 
-- ¿`metadata` o `screenOptions` como nombre de la export?
-- ¿Debe `generateMetadata` recibir también `pathname`/`segments` además de
-  `params`?
-- ¿Merece la pena un `metadata` a nivel de `layout.ts` que aplique
-  defaults a todas las hijas de la carpeta (equivalente al
-  `screenOptions` de navegador de React Navigation)?
-- Versionado: el paso 3 implica major (2.0) o se agrupa con otros breaking
-  changes pendientes.
+Resueltas el 2026-07-11 (eran las preguntas abiertas de la primera
+versión de este documento):
+
+- **Nombre de la export: `metadata`.** Prima la familiaridad con Next.js
+  sobre la literalidad de `screenOptions`.
+- **`generateMetadata` recibe `{ params, pathname, segments }`.** El
+  matcher ya los tiene; añadirlos después no rompería la firma (es un
+  objeto), pero exponerlos desde el principio evita la duda.
+- **Metadata a nivel de `layout.ts` (defaults para las hijas): pospuesta.**
+  La cadena de precedencia deja hueco para insertarla más adelante entre
+  los defaults del paquete y la metadata de página, sin breaking change.
+- **El stack implícito por defecto entra antes del release 1.0.** El
+  paquete está en 0.x y el 1.0 sigue pendiente del checklist iOS; no hace
+  falta un major, y el 1.0 se publica ya con el modelo definitivo.

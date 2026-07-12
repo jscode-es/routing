@@ -1,6 +1,16 @@
-import React, { createContext, useContext } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import type { ComponentType, ReactNode } from 'react';
+import { hasImplicitStack } from '../route-tree/implicit';
 import type { RouteNode } from '../route-tree/types';
+import { DeclaredNavigator } from './DeclaredNavigator';
+import type { LayoutProps, PageProps } from './page-props';
+import { warnDev } from './dev';
+import { readNavigatorConfig } from './navigator-config';
 import type { NavigationEntry } from './reducer';
 import type { Router } from './router';
 
@@ -32,6 +42,38 @@ export const DepthContext = createContext(0);
 
 export const SlotContext = createContext<ReactNode>(null);
 
+// Registro de navegadores montados en un mismo nivel de ruta: cada
+// RouteLevel provee el suyo, y Stack/Tabs se registran para detectar un
+// layout que renderiza a la vez {children} y un navegador propio.
+interface NavigatorMountRegistry {
+  register(): () => void;
+}
+
+function createMountRegistry(): NavigatorMountRegistry {
+  let count = 0;
+  return {
+    register() {
+      count += 1;
+      if (count > 1) {
+        warnDev(
+          'A route level mounted more than one navigator: render either {children} or an explicit <Stack>/<Tabs> in the layout, not both.',
+        );
+      }
+      return () => {
+        count -= 1;
+      };
+    },
+  };
+}
+
+export const NavigatorMountContext =
+  createContext<NavigatorMountRegistry | null>(null);
+
+export function useNavigatorMountGuard(): void {
+  const registry = useContext(NavigatorMountContext);
+  useEffect(() => registry?.register(), [registry]);
+}
+
 export function useRouterState(): RouterState {
   const state = useContext(RouterStateContext);
   if (!state) {
@@ -49,30 +91,57 @@ export function RouteLevel({
   chain: RouteNode[];
   index: number;
 }): React.JSX.Element | null {
+  const [levelMounts] = useState(createMountRegistry);
+  // Entrada del subárbol propio: las pantallas en background conservan sus
+  // params/pathname aunque activeEntry viva en otro subárbol.
+  const ownEntry = useContext(EntryContext);
+  const { activeEntry } = useRouterState();
   const node = chain[index];
   if (!node) return null;
+  const entry = ownEntry ?? activeEntry;
 
   const isLeaf = index === chain.length - 1;
-  const Component = node.component as ComponentType | undefined;
+  const Component = node.component as ComponentType<PageProps> | undefined;
   const inner = isLeaf ? (
     Component ? (
-      <Component />
+      <Component params={entry.match.params} pathname={entry.pathname} />
     ) : null
   ) : (
     <RouteLevel chain={chain} index={index + 1} />
   );
 
-  let body = inner;
+  // El contenido del nivel es el navegador de la carpeta: el declarado en
+  // layout.ts, o el Stack implícito (raíz siempre; carpetas, con más de una
+  // entrada); slot es el paso directo. Un layout con componente lo recibe
+  // como children (contrato estilo Next.js); SlotContext se mantiene con el
+  // subárbol directo por compatibilidad con <Slot>.
+  const config = readNavigatorConfig(node);
+  let content = inner;
+  if (config) {
+    if (config.type !== 'slot') content = <DeclaredNavigator config={config} />;
+  } else if (hasImplicitStack(node, index === 0)) {
+    content = <DeclaredNavigator config={{ type: 'stack' }} />;
+  }
+
+  let body = content;
   if (node.layout) {
-    const Layout = node.layout as ComponentType;
+    const Layout = node.layout as ComponentType<LayoutProps>;
     body = (
       <SlotContext.Provider value={inner}>
-        <Layout />
+        <Layout params={entry.match.params} pathname={entry.pathname}>
+          {content}
+        </Layout>
       </SlotContext.Provider>
     );
   }
 
-  return <DepthContext.Provider value={index}>{body}</DepthContext.Provider>;
+  return (
+    <DepthContext.Provider value={index}>
+      <NavigatorMountContext.Provider value={levelMounts}>
+        {body}
+      </NavigatorMountContext.Provider>
+    </DepthContext.Provider>
+  );
 }
 
 export function EntrySubtree({
@@ -86,9 +155,11 @@ export function EntrySubtree({
   // Ruta index: la hoja es el propio nodo del layout, no hay nivel inferior.
   if (layoutDepth === chain.length - 1) {
     const Component = chain[layoutDepth]?.component as
-      | ComponentType
+      | ComponentType<PageProps>
       | undefined;
-    return Component ? <Component /> : null;
+    return Component ? (
+      <Component params={entry.match.params} pathname={entry.pathname} />
+    ) : null;
   }
   return <RouteLevel chain={chain} index={layoutDepth + 1} />;
 }

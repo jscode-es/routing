@@ -2,27 +2,29 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from '@authuser/react-native-routing';
 import type { ScreenMetadata } from '@authuser/react-native-routing';
+import { setPremium } from '../../auth';
 
 export const metadata: ScreenMetadata = {
-  title: 'Modal',
-  presentation: 'modal',
-  headerShown: false,
-  safeArea: false,
-  orientation: 'landscape',
-  contentStyle: { backgroundColor: '#111' },
+  title: 'Premium',
+  tab: {
+    icon: ({ focused, size }) => (
+      <Text style={{ fontSize: size, opacity: focused ? 1 : 0.4 }}>⭐</Text>
+    ),
+  },
 };
 
-export default function Modal() {
+export default function Premium() {
   const router = useRouter();
+  const cancel = () => {
+    setPremium(false);
+    router.replace('/upgrade');
+  };
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Modal OTT</Text>
-      <Text style={styles.subtitle}>
-        Sin header y sin safe area: el contenido llega hasta el borde
-        superior, debajo del reloj.
-      </Text>
-      <Pressable style={styles.button} onPress={() => router.back()}>
-        <Text style={styles.buttonText}>Cerrar</Text>
+      <Text style={styles.title}>⭐ Premium</Text>
+      <Text>Contenido exclusivo para suscriptores</Text>
+      <Pressable style={styles.button} onPress={cancel}>
+        <Text style={styles.buttonText}>Cancelar suscripción</Text>
       </Pressable>
     </View>
   );
@@ -34,20 +36,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 16,
-    padding: 24,
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: 'white',
-  },
-  subtitle: {
-    color: '#bbb',
-    textAlign: 'center',
   },
   button: {
-    marginTop: 12,
-    backgroundColor: '#0a7ea4',
+    backgroundColor: '#c0392b',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,

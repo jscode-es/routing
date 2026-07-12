@@ -40,9 +40,38 @@ function childFolder<C>(node: RouteNode<C>, segment: string): RouteNode<C> {
   return found;
 }
 
+export interface RouteModuleMeta {
+  metadata?: unknown;
+  generateMetadata?: unknown;
+  navigator?: unknown;
+}
+
+function requireComponent<C>(key: string, component: C | undefined): C {
+  if (component === undefined) {
+    throw new Error(
+      `Route file "${key}" has no default export. Every route file must export its screen component as default.`,
+    );
+  }
+  return component;
+}
+
+function attachMeta<C>(
+  node: RouteNode<C>,
+  key: string,
+  resolveMeta?: (key: string) => RouteModuleMeta,
+): void {
+  if (!resolveMeta) return;
+  const meta = resolveMeta(key);
+  if (meta.metadata !== undefined) node.metadata = meta.metadata;
+  if (meta.generateMetadata !== undefined) {
+    node.generateMetadata = meta.generateMetadata;
+  }
+}
+
 export function parse<C>(
   keys: readonly string[],
-  resolve: (key: string) => C,
+  resolve: (key: string) => C | undefined,
+  resolveMeta?: (key: string) => RouteModuleMeta,
 ): RouteNode<C> {
   const root = makeNode<C>('');
 
@@ -59,16 +88,28 @@ export function parse<C>(
     }
 
     if (fileName === 'layout') {
-      node.layout = resolve(key);
+      // Un layout puede ser componente, config declarativa o ambas cosas.
+      const layout = resolve(key);
+      const navigator = resolveMeta?.(key).navigator;
+      if (layout === undefined && navigator === undefined) {
+        throw new Error(
+          `Layout file "${key}" must export a default component or a navigator config ("export const navigator").`,
+        );
+      }
+      if (layout !== undefined) node.layout = layout;
+      if (navigator !== undefined) node.navigator = navigator;
     } else if (fileName === 'not-found') {
-      node.notFound = resolve(key);
+      node.notFound = requireComponent(key, resolve(key));
+      const meta = resolveMeta?.(key);
+      if (meta?.metadata !== undefined) node.notFoundMetadata = meta.metadata;
     } else if (fileName === 'index') {
       if (node.component !== undefined) {
         throw new Error(
           `Conflicting routes: "${key}" collides with an existing route for "${node.segment || '/'}"`,
         );
       }
-      node.component = resolve(key);
+      node.component = requireComponent(key, resolve(key));
+      attachMeta(node, key, resolveMeta);
     } else {
       const leaf = childFolder(node, fileName);
       if (leaf.component !== undefined) {
@@ -76,7 +117,8 @@ export function parse<C>(
           `Conflicting routes: "${key}" collides with an existing route for "${leaf.segment}"`,
         );
       }
-      leaf.component = resolve(key);
+      leaf.component = requireComponent(key, resolve(key));
+      attachMeta(leaf, key, resolveMeta);
     }
   }
 

@@ -1,7 +1,17 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Redirect, usePathname } from '@jscode/react-native-routing';
+import { Redirect, usePathname } from '@authuser/react-native-routing';
+import type { ScreenMetadata } from '@authuser/react-native-routing';
 import { setSession, useSession } from '../../auth';
+
+export const metadata: ScreenMetadata = {
+  title: 'Perfil',
+  tab: {
+    icon: ({ focused, size }) => (
+      <Text style={{ fontSize: size, opacity: focused ? 1 : 0.4 }}>👤</Text>
+    ),
+  },
+};
 
 export default function Profile() {
   const session = useSession();
