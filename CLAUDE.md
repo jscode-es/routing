@@ -13,8 +13,8 @@ Docs en `docs/` (leer antes de implementar una feature): `architecture.md` (dise
 ```sh
 npm run typecheck            # tsc --noEmit
 npm run lint                 # eslint .
-npm run test:unit            # vitest: src/route-tree/ y metro/
-npm run test:rn              # jest + RNTL: src/navigation/
+npm run test:unit            # vitest: test/route-tree/, test/metro/ y test/babel/
+npm run test:rn              # jest + RNTL: test/navigation/
 npm run test                 # ambos
 npm run build                # tsc -p tsconfig.build.json → dist/
 npm run smoke                # npm pack + require() del tarball instalado
@@ -24,15 +24,17 @@ npm run example:android      # app example/ en emulador (workspace)
 Un solo test:
 
 ```sh
-npx vitest run src/route-tree/parse.test.ts
-npx jest src/navigation/Stack.test.tsx
+npx vitest run test/route-tree/parse.test.ts
+npx jest test/navigation/Stack.test.tsx
 npx jest -t "nombre del test"
 ```
 
 ## Split de tests (regla dura)
 
-- `src/route-tree/**` y `metro/**` → **vitest** (entorno node, lógica pura).
-- `src/navigation/**` → **jest** con `@react-native/jest-preset` + `@testing-library/react-native`. `jest.setup.js` mockea a mano `react-native-screens` (Views planas conservando props para asertar sobre `activityState`, `title`, `onDismissed`…), `react-native-screens/experimental` y `react-native-reanimated` (el mock oficial de reanimated no sirve: importa el módulo nativo de worklets).
+Todos los tests viven en `test/`, replicando la carpeta del código que cubren:
+
+- `test/route-tree/**`, `test/metro/**` y `test/babel/**` → **vitest** (entorno node, lógica pura).
+- `test/navigation/**` → **jest** con `@react-native/jest-preset` + `@testing-library/react-native`. `jest.setup.js` mockea a mano `react-native-screens` (Views planas conservando props para asertar sobre `activityState`, `title`, `onDismissed`…), `react-native-screens/experimental` y `react-native-reanimated` (el mock oficial de reanimated no sirve: importa el módulo nativo de worklets).
 
 Metodología del proyecto: TDD — tests primero, y cada fase termina con verificación manual en `example/` sobre emulador Android (checklist iOS pendiente de Mac; ver roadmap).
 
