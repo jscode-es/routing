@@ -43,9 +43,7 @@
 		"babel",
 		"dist",
 		"metro",
-		"src",
-		"!**/*.test.ts",
-		"!**/*.test.tsx"
+		"src"
 	],
 	"sideEffects": false,
 	"publishConfig": {

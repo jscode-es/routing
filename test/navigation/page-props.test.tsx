@@ -1,10 +1,10 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
-import { RootRouter } from './RootRouter';
-import { router } from './router';
-import type { RequireContext } from '../route-tree/context';
-import type { LayoutProps, PageProps } from './page-props';
+import { RootRouter } from '../../src/navigation/RootRouter';
+import { router } from '../../src/navigation/router';
+import type { RequireContext } from '../../src/route-tree/context';
+import type { LayoutProps, PageProps } from '../../src/navigation/page-props';
 
 type RouteModule = Record<string, unknown>;
 

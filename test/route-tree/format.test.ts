@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { formatRouteTree } from './format';
-import { parse } from './parse';
+import { formatRouteTree } from '../../src/route-tree/format';
+import { parse } from '../../src/route-tree/parse';
 
 const resolve = (key: string) =>
   key === './(tabs)/layout.ts' ? undefined : key;

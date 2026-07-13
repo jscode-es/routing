@@ -3,11 +3,11 @@ import {
   collectScreenConfigs,
   createBackPressHandler,
   screenNameForEntry,
-} from './stack-options';
-import { StackScreen } from './stack-options';
-import { createEntry } from './reducer';
-import { parse } from '../route-tree/parse';
-import { matchPath } from '../route-tree/match';
+} from '../../src/navigation/stack-options';
+import { StackScreen } from '../../src/navigation/stack-options';
+import { createEntry } from '../../src/navigation/reducer';
+import { parse } from '../../src/route-tree/parse';
+import { matchPath } from '../../src/route-tree/match';
 
 const resolve = (key: string) => key;
 const tree = parse(

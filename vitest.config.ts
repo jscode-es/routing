@@ -4,9 +4,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: [
-      'src/route-tree/**/*.test.ts',
-      'metro/**/*.test.ts',
-      'babel/**/*.test.ts',
+      'test/route-tree/**/*.test.ts',
+      'test/metro/**/*.test.ts',
+      'test/babel/**/*.test.ts',
     ],
     globals: false,
   },

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Linking, Text } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
-import { RootRouter } from './RootRouter';
-import { urlToPath } from './linking';
-import { useLocalSearchParams } from './hooks';
-import type { RequireContext } from '../route-tree/context';
+import { RootRouter } from '../../src/navigation/RootRouter';
+import { urlToPath } from '../../src/navigation/linking';
+import { useLocalSearchParams } from '../../src/navigation/hooks';
+import type { RequireContext } from '../../src/route-tree/context';
 
 function fakeContext(modules: Record<string, unknown>): RequireContext {
   const ctx = ((key: string) => ({ default: modules[key] })) as RequireContext;

@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
-import { RootRouter } from './RootRouter';
-import { Stack } from './Stack';
-import { Tabs } from './Tabs';
-import { router } from './router';
-import type { RequireContext } from '../route-tree/context';
-import type { GenerateMetadata, ScreenMetadata } from './metadata';
+import { RootRouter } from '../../src/navigation/RootRouter';
+import { Stack } from '../../src/navigation/Stack';
+import { Tabs } from '../../src/navigation/Tabs';
+import { router } from '../../src/navigation/router';
+import type { RequireContext } from '../../src/route-tree/context';
+import type { GenerateMetadata, ScreenMetadata } from '../../src/navigation/metadata';
 
 type RouteModule = Record<string, unknown>;
 

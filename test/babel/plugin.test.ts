@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { transformSync } from '@babel/core';
 import { describe, expect, it } from 'vitest';
-import plugin from './plugin';
+import plugin from '../../babel/plugin';
 
 const PROJECT_ROOT = path.resolve('/project/example');
 const APP_CONTEXT_FILENAME = path.join(

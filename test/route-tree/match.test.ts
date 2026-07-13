@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { parse } from './parse';
-import { matchNotFound, matchPath } from './match';
+import { parse } from '../../src/route-tree/parse';
+import { matchNotFound, matchPath } from '../../src/route-tree/match';
 
 const resolve = (key: string) => key;
 

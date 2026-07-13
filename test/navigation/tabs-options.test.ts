@@ -4,9 +4,9 @@ import {
   hrefForTab,
   resolveTabs,
   TabsScreen,
-} from './tabs-options';
-import { parse } from '../route-tree/parse';
-import { matchPath } from '../route-tree/match';
+} from '../../src/navigation/tabs-options';
+import { parse } from '../../src/route-tree/parse';
+import { matchPath } from '../../src/route-tree/match';
 
 const resolve = (key: string) => key;
 const tree = parse(

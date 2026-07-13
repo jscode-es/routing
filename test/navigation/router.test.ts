@@ -1,4 +1,4 @@
-import { router } from './router';
+import { router } from '../../src/navigation/router';
 
 describe('imperative router (unmounted)', () => {
   it('throws a clear error when used before RootRouter mounts', () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { buildRouteTree } from './context';
-import type { RequireContext } from './context';
+import { buildRouteTree } from '../../src/route-tree/context';
+import type { RequireContext } from '../../src/route-tree/context';
 
 function fakeContext(modules: Record<string, unknown>): RequireContext {
   const ctx = ((key: string) => ({ default: modules[key] })) as RequireContext;

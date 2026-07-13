@@ -1,7 +1,7 @@
-import { reducer, createEntry } from './reducer';
-import type { NavigationState } from './reducer';
-import { parse } from '../route-tree/parse';
-import { matchPath } from '../route-tree/match';
+import { reducer, createEntry } from '../../src/navigation/reducer';
+import type { NavigationState } from '../../src/navigation/reducer';
+import { parse } from '../../src/route-tree/parse';
+import { matchPath } from '../../src/route-tree/match';
 
 const resolve = (key: string) => key;
 const tree = parse(['./index.tsx', './users/[id].tsx'], resolve);

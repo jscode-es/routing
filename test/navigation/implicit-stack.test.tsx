@@ -2,9 +2,9 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import type { ReactNode } from 'react';
 import { act, render, screen } from '@testing-library/react-native';
-import { RootRouter } from './RootRouter';
-import { router } from './router';
-import type { RequireContext } from '../route-tree/context';
+import { RootRouter } from '../../src/navigation/RootRouter';
+import { router } from '../../src/navigation/router';
+import type { RequireContext } from '../../src/route-tree/context';
 
 type RouteModule = Record<string, unknown>;
 

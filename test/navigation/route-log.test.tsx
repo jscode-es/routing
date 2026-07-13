@@ -1,8 +1,8 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { render } from '@testing-library/react-native';
-import { RootRouter } from './RootRouter';
-import type { RequireContext } from '../route-tree/context';
+import { RootRouter } from '../../src/navigation/RootRouter';
+import type { RequireContext } from '../../src/route-tree/context';
 
 type RouteModule = Record<string, unknown>;
 

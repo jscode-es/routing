@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { parse } from './parse';
-import type { RouteNode } from './types';
+import { parse } from '../../src/route-tree/parse';
+import type { RouteNode } from '../../src/route-tree/types';
 
 const resolve = (key: string) => key;
 

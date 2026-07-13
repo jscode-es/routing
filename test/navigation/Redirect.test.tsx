@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Pressable, Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { RootRouter } from './RootRouter';
-import { Redirect } from './Redirect';
-import { Stack } from './Stack';
-import type { RequireContext } from '../route-tree/context';
+import { RootRouter } from '../../src/navigation/RootRouter';
+import { Redirect } from '../../src/navigation/Redirect';
+import { Stack } from '../../src/navigation/Stack';
+import type { RequireContext } from '../../src/route-tree/context';
 
 function fakeContext(modules: Record<string, unknown>): RequireContext {
   const ctx = ((key: string) => ({ default: modules[key] })) as RequireContext;

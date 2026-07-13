@@ -1,17 +1,17 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { RootRouter } from './RootRouter';
-import { Slot } from './Slot';
-import { router } from './router';
+import { RootRouter } from '../../src/navigation/RootRouter';
+import { Slot } from '../../src/navigation/Slot';
+import { router } from '../../src/navigation/router';
 import {
   useGlobalSearchParams,
   useLocalSearchParams,
   usePathname,
   useRouter,
   useSegments,
-} from './hooks';
-import type { RequireContext } from '../route-tree/context';
+} from '../../src/navigation/hooks';
+import type { RequireContext } from '../../src/route-tree/context';
 
 function fakeContext(modules: Record<string, unknown>): RequireContext {
   const ctx = ((key: string) => ({ default: modules[key] })) as RequireContext;

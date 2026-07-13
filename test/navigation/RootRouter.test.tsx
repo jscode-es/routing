@@ -1,12 +1,12 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { RootRouter } from './RootRouter';
-import { Link } from './Link';
-import type { RequireContext } from '../route-tree/context';
+import { RootRouter } from '../../src/navigation/RootRouter';
+import { Link } from '../../src/navigation/Link';
+import type { RequireContext } from '../../src/route-tree/context';
 
 const mockGetAppContext = jest.fn<RequireContext | null, []>(() => null);
-jest.mock('../route-tree/app-context', () => ({
+jest.mock('../../src/route-tree/app-context', () => ({
   getAppContext: () => mockGetAppContext(),
 }));
 

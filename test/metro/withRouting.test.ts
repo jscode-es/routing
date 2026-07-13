@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { withRouting } from './withRouting';
+import { withRouting } from '../../metro/withRouting';
 
 describe('withRouting', () => {
   it('enables unstable_allowRequireContext', () => {

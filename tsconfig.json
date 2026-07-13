@@ -16,5 +16,5 @@
     "resolveJsonModule": true,
     "noEmit": true
   },
-  "include": ["src", "metro", "babel"]
+  "include": ["src", "metro", "babel", "test"]
 }
