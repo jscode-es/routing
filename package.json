@@ -1,6 +1,6 @@
 {
 	"name": "@authuser/react-native-routing",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "File-based router for React Native, without Expo or React Navigation.",
 	"license": "MIT",
 	"author": "sgonzalez@jscode.es",
