@@ -1,3 +1,11 @@
+# [1.1.0](https://github.com/jscode-es/routing/compare/v1.0.0...v1.1.0) (2026-07-14)
+
+
+### Features
+
+* **stack:** add header color, transparency and blur styling ([674563a](https://github.com/jscode-es/routing/commit/674563a40f2e78e3df9f833fc532e189e0d6778d))
+* **tabs:** add theming, scroll-based hide/show and accessibility ([38b004a](https://github.com/jscode-es/routing/commit/38b004acdb57437ddfa18ba04dd8d14b1e15f280))
+
 # 1.0.0 (2026-07-12)
 
 
