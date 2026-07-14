@@ -200,11 +200,24 @@ soportadas:
 | `animation` | Transición nativa de la pantalla: `'default' \| 'fade' \| 'fade_from_bottom' \| 'flip' \| 'none' \| 'simple_push' \| 'slide_from_bottom' \| 'slide_from_right' \| 'slide_from_left'`. `'none'` la desactiva. |
 | `orientation` | Orientación forzada mientras la pantalla está en primer plano: `'default' \| 'all' \| 'portrait' \| 'portrait_up' \| 'portrait_down' \| 'landscape' \| 'landscape_left' \| 'landscape_right'`. Al hacer pop se restaura la de la pantalla anterior — ideal para un player en `'landscape'` con el resto de la app en portrait. En iOS la app debe declarar las orientaciones permitidas en `Info.plist` (`UISupportedInterfaceOrientations`). |
 | `contentStyle` | Estilo del contenedor de la pantalla; por defecto lleva un fondo opaco `#f2f2f2` para que las transiciones push/pop no se mezclen con la pantalla inferior (`transparentModal` no lo aplica). |
+| `headerStyle` | `{ backgroundColor }` del header nativo. |
+| `headerTintColor` | Color del icono/texto de "atrás" y del título (nativas `color` + `titleColor`). |
+| `headerShadowVisible` | `false` oculta la sombra/borde inferior del header. Por defecto `true`. |
+| `headerTransparent` | Header transparente y translúcido (el contenido pasa por debajo). Combínalo con `headerStyle.backgroundColor` semitransparente o `headerBlurEffect` para un navbar tipo OTT. |
+| `headerBlurEffect` | Efecto de blur del header (solo iOS; requiere alpha < 1 en el `backgroundColor`). |
 
 ```tsx
 <Stack.Screen
   name="player"
   options={{ headerShown: false, safeArea: false, contentStyle: { backgroundColor: '#000' } }}
+/>
+<Stack.Screen
+  name="feed"
+  options={{
+    headerTransparent: true,
+    headerStyle: { backgroundColor: 'rgba(0,0,0,0.3)' },
+    headerTintColor: '#fff',
+  }}
 />
 ```
 

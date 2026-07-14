@@ -335,4 +335,94 @@ describe('Stack', () => {
     await render(<RootRouter context={ctx} />);
     expect(screen.getByTestId('header-config').props.title).toBe('index');
   });
+
+  it('maps headerStyle and headerTintColor to the native header config', async () => {
+    const Layout = () => (
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{
+            headerStyle: { backgroundColor: '#111827' },
+            headerTintColor: '#ffffff',
+          }}
+        />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': Layout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    const header = screen.getByTestId('header-config');
+    expect(header.props.backgroundColor).toBe('#111827');
+    expect(header.props.color).toBe('#ffffff');
+    expect(header.props.titleColor).toBe('#ffffff');
+  });
+
+  it('hides the header shadow with headerShadowVisible: false', async () => {
+    const Layout = () => (
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShadowVisible: false }} />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': Layout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    expect(screen.getByTestId('header-config').props.hideShadow).toBe(true);
+  });
+
+  it('keeps the header shadow by default', async () => {
+    await render(<RootRouter context={makeContext()} />);
+    expect(
+      screen.getByTestId('header-config').props.hideShadow,
+    ).toBeUndefined();
+  });
+
+  it('makes the header transparent and translucent with headerTransparent', async () => {
+    const Layout = () => (
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{ headerTransparent: true, headerBlurEffect: 'regular' }}
+        />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': Layout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    const header = screen.getByTestId('header-config');
+    expect(header.props.backgroundColor).toBe('transparent');
+    expect(header.props.translucent).toBe(true);
+    expect(header.props.blurEffect).toBe('regular');
+  });
+
+  it('lets headerStyle override the background even when transparent', async () => {
+    const Layout = () => (
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{
+            headerTransparent: true,
+            headerStyle: { backgroundColor: 'rgba(0,0,0,0.4)' },
+          }}
+        />
+      </Stack>
+    );
+    const ctx = fakeContext({
+      './layout.tsx': Layout,
+      './index.tsx': Home,
+      './users/[id].tsx': User,
+    });
+    await render(<RootRouter context={ctx} />);
+    expect(screen.getByTestId('header-config').props.backgroundColor).toBe(
+      'rgba(0,0,0,0.4)',
+    );
+  });
 });

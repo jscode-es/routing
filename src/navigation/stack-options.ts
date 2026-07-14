@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ReactNode } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
+import type { BlurEffectTypes } from 'react-native-screens';
 import type { NavigationEntry } from './reducer';
 
 export type ScreenOrientation =
@@ -35,6 +36,15 @@ export interface StackScreenOptions {
   // gestiona el propio header nativo). false = contenido a sangre bajo la
   // barra de estado (full-bleed, estilo OTT).
   safeArea?: boolean;
+  headerStyle?: { backgroundColor?: ColorValue };
+  // Color de icono de back, texto de back (iOS) y título.
+  headerTintColor?: ColorValue;
+  // Sombra/borde inferior del header nativo. Por defecto true.
+  headerShadowVisible?: boolean;
+  // Fondo transparente + translúcido; combínalo con headerBlurEffect (iOS)
+  // o con headerStyle.backgroundColor semitransparente para un navbar OTT.
+  headerTransparent?: boolean;
+  headerBlurEffect?: BlurEffectTypes;
 }
 
 export interface StackScreenProps {

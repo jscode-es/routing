@@ -186,6 +186,15 @@ function StackComponent({
               // Un ancestro ya aplicó el inset superior: este header no
               // debe volver a sumar el alto de la barra de estado.
               disableTopInsetApplication={topInsetHandled ? true : undefined}
+              backgroundColor={
+                options.headerStyle?.backgroundColor ??
+                (options.headerTransparent ? 'transparent' : undefined)
+              }
+              color={options.headerTintColor}
+              titleColor={options.headerTintColor}
+              hideShadow={options.headerShadowVisible === false ? true : undefined}
+              translucent={options.headerTransparent || undefined}
+              blurEffect={options.headerBlurEffect}
             />
           </Screen>
         );
