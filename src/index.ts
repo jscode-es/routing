@@ -20,6 +20,9 @@ export type {
   TabsScreenOptions,
   TabsScreenProps,
 } from './navigation/tabs-options';
+export { useHideTabBarOnScroll } from './navigation/tab-bar-visibility';
+export type { TabBarScrollHandlers } from './navigation/tab-bar-visibility';
+export { useScreenReaderEnabled } from './navigation/accessibility';
 export { Link } from './navigation/Link';
 export type { LinkProps } from './navigation/Link';
 export { Redirect } from './navigation/Redirect';

@@ -1,6 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import { AccessibilityInfo, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Screen, ScreenContainer } from 'react-native-screens';
 import { SafeAreaView } from 'react-native-screens/experimental';
 import Animated, {
@@ -9,6 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { matchPath } from '../route-tree/match';
+import { useReduceMotionEnabled } from './accessibility';
 import {
   DepthContext,
   EntryContext,
@@ -20,6 +22,7 @@ import {
 import { createEntry } from './reducer';
 import type { NavigationEntry } from './reducer';
 import { screenNameForEntry } from './stack-options';
+import { TabBarVisibilityContext } from './tab-bar-visibility';
 import { hrefForTab, resolveTabs, TabsScreen } from './tabs-options';
 
 const ACTIVE_COLOR = '#0a7ea4';
@@ -36,6 +39,12 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#c7c7c7',
   },
+  // El alto se anima (colapso real, no transform) para que el contenido
+  // recupere el espacio de verdad al ocultar la barra, en vez de dejar un
+  // hueco en blanco reservado por el flex.
+  barCollapse: {
+    overflow: 'hidden',
+  },
   bar: {
     flexDirection: 'row',
   },
@@ -47,14 +56,13 @@ const styles = StyleSheet.create({
     gap: 2,
     minHeight: 48,
   },
-  label: { color: INACTIVE_COLOR, fontSize: 13 },
-  labelActive: { color: ACTIVE_COLOR, fontSize: 13, fontWeight: '600' },
+  label: { fontSize: 13 },
+  labelActive: { fontSize: 13, fontWeight: '600' },
   indicator: {
     position: 'absolute',
     top: 0,
     left: 0,
     height: 2,
-    backgroundColor: ACTIVE_COLOR,
   },
 });
 
@@ -69,12 +77,13 @@ function TabFade({
   children: ReactNode;
 }): React.JSX.Element {
   const opacity = useSharedValue(1);
+  const reduceMotion = useReduceMotionEnabled();
   useEffect(() => {
-    if (active) {
+    if (active && !reduceMotion) {
       opacity.value = 0;
       opacity.value = withTiming(1, { duration: 200 });
     }
-  }, [active, opacity]);
+  }, [active, opacity, reduceMotion]);
   const style = useAnimatedStyle(() => ({ opacity: opacity.value }), []);
   return (
     <Animated.View testID="tab-fade" style={[styles.container, style]}>
@@ -89,12 +98,18 @@ function TabsComponent({
   showLabel = true,
   order,
   hidden,
+  style,
+  activeTintColor = ACTIVE_COLOR,
+  inactiveTintColor = INACTIVE_COLOR,
 }: {
   children?: ReactNode;
   animation?: 'none' | 'fade';
   showLabel?: boolean;
   order?: string[];
   hidden?: string[];
+  style?: StyleProp<ViewStyle>;
+  activeTintColor?: string;
+  inactiveTintColor?: string;
 }): React.JSX.Element {
   const { tree, activeEntry } = useRouterState();
   useNavigatorMountGuard();
@@ -142,11 +157,16 @@ function TabsComponent({
     setEntries({ ...entries, ...pending });
   }
 
+  const reduceMotion = useReduceMotionEnabled();
+  const animationDuration = reduceMotion ? 0 : 200;
+
   const [barWidth, setBarWidth] = useState(0);
   const progress = useSharedValue(indicatorIndex);
   useEffect(() => {
-    progress.value = withTiming(indicatorIndex, { duration: 200 });
-  }, [indicatorIndex, progress]);
+    progress.value = withTiming(indicatorIndex, {
+      duration: animationDuration,
+    });
+  }, [indicatorIndex, progress, animationDuration]);
   const itemWidth = tabs.length > 0 ? barWidth / tabs.length : 0;
   const indicatorStyle = useAnimatedStyle(
     () => ({
@@ -156,69 +176,142 @@ function TabsComponent({
     [itemWidth],
   );
 
+  // Progreso de ocultación de la barra (0 = visible, 1 = oculta), pilotado
+  // por useHideTabBarOnScroll desde cualquier pantalla descendiente.
+  const [barHeight, setBarHeight] = useState(0);
+  const visibility = useSharedValue(0);
+  useEffect(() => {
+    visibility.value = withTiming(0, { duration: animationDuration });
+  }, [activeName, visibility, animationDuration]);
+  const barAnimatedStyle = useAnimatedStyle(
+    () => ({
+      // Sin medir aún: alto natural (auto) para no forzar 0 en el primer
+      // frame.
+      height:
+        barHeight === 0 ? undefined : barHeight * (1 - visibility.value),
+    }),
+    [barHeight],
+  );
+
+  // Anuncio a lectores de pantalla al cambiar de pestaña: a diferencia de un
+  // push/pop del Stack (transición nativa que el SO anuncia solo), cambiar
+  // de pestaña no dispara nada nativo porque todas viven en el mismo árbol.
+  const activeTab = allTabs.find((tab) => tab.name === activeName);
+  const activeAccessibilityLabel =
+    activeTab?.options.accessibilityLabel ??
+    activeTab?.options.title ??
+    activeName;
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    AccessibilityInfo.announceForAccessibility(activeAccessibilityLabel);
+  }, [activeAccessibilityLabel]);
+
   return (
     <View style={styles.root}>
-      <ScreenContainer style={styles.container}>
-        {contentTabs.map((tab) => {
-          const entry = entries[tab.name];
-          if (!entry) return null;
-          const active = tab.name === activeName;
-          return (
-            <Screen
-              key={tab.name}
-              style={StyleSheet.absoluteFill}
-              activityState={active ? 2 : 0}
-            >
-              <EntryContext.Provider value={entry}>
-                {animation === 'fade' ? (
-                  <TabFade active={active}>
-                    <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
-                  </TabFade>
-                ) : (
-                  <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
-                )}
-              </EntryContext.Provider>
-            </Screen>
-          );
-        })}
-      </ScreenContainer>
-      <SafeAreaView edges={{ bottom: true }} style={styles.barSafeArea}>
-        <View
-          style={styles.bar}
-          onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
-        >
-          {activeIndex >= 0 && (
-            <Animated.View
-              testID="tab-indicator"
-              style={[styles.indicator, indicatorStyle]}
-            />
-          )}
-          {tabs.map((tab) => {
+      <TabBarVisibilityContext.Provider value={visibility}>
+        <ScreenContainer style={styles.container}>
+          {contentTabs.map((tab) => {
+            const entry = entries[tab.name];
+            if (!entry) return null;
             const active = tab.name === activeName;
             return (
-              <Pressable
+              <Screen
                 key={tab.name}
-                testID={`tab-${tab.name}`}
-                style={styles.item}
-                onPress={() =>
-                  switchTab?.(hrefForTab(chain, layoutDepth, tab.name))
-                }
+                style={StyleSheet.absoluteFill}
+                activityState={active ? 2 : 0}
               >
-                {tab.options.icon?.({
-                  focused: active,
-                  color: active ? ACTIVE_COLOR : INACTIVE_COLOR,
-                  size: ICON_SIZE,
-                })}
-                {showLabel && (
-                  <Text style={active ? styles.labelActive : styles.label}>
-                    {tab.options.title ?? tab.name}
-                  </Text>
-                )}
-              </Pressable>
+                <EntryContext.Provider value={entry}>
+                  {animation === 'fade' ? (
+                    <TabFade active={active}>
+                      <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
+                    </TabFade>
+                  ) : (
+                    <EntrySubtree entry={entry} layoutDepth={layoutDepth} />
+                  )}
+                </EntryContext.Provider>
+              </Screen>
             );
           })}
+        </ScreenContainer>
+      </TabBarVisibilityContext.Provider>
+      <Animated.View
+        testID="tabs-bar"
+        style={[styles.barCollapse, barAnimatedStyle]}
+      >
+        <View
+          onLayout={(e: LayoutChangeEvent) => {
+            // Máximo histórico: mientras la barra colapsa, este View se
+            // remide contra el alto ya reducido del padre y reportaría
+            // valores decrecientes que corromperían la medida real.
+            const height = e.nativeEvent.layout.height;
+            setBarHeight((current) => Math.max(current, height));
+          }}
+        >
+          <SafeAreaView
+            edges={{ bottom: true }}
+            style={[styles.barSafeArea, style]}
+          >
+            <View
+              style={styles.bar}
+              onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
+            >
+              {activeIndex >= 0 && (
+                <Animated.View
+                  testID="tab-indicator"
+                  style={[
+                    styles.indicator,
+                    indicatorStyle,
+                    { backgroundColor: activeTintColor },
+                  ]}
+                />
+              )}
+              {tabs.map((tab) => {
+                const active = tab.name === activeName;
+                const tintColor = active
+                  ? activeTintColor
+                  : inactiveTintColor;
+                return (
+                  <Pressable
+                    key={tab.name}
+                    testID={`tab-${tab.name}`}
+                    accessibilityRole="tab"
+                    accessibilityState={{ selected: active }}
+                    accessibilityLabel={
+                      tab.options.accessibilityLabel ??
+                      tab.options.title ??
+                      tab.name
+                    }
+                    style={styles.item}
+                    onPress={() =>
+                      switchTab?.(hrefForTab(chain, layoutDepth, tab.name))
+                    }
+                  >
+                    {tab.options.icon?.({
+                      focused: active,
+                      color: tintColor,
+                      size: ICON_SIZE,
+                    })}
+                    {showLabel && (
+                      <Text
+                        style={[
+                          active ? styles.labelActive : styles.label,
+                          { color: tintColor },
+                        ]}
+                      >
+                        {tab.options.title ?? tab.name}
+                      </Text>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </SafeAreaView>
         </View>
-      </SafeAreaView>
+      </Animated.View>
     </View>
   );
 }

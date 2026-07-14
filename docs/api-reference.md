@@ -241,10 +241,12 @@ con título e icono desde el `metadata` de cada página (`title` plano,
 icono bajo `tab.icon`; el de una carpeta como `settings/` sale del
 `metadata` de su `index`).
 
-Opciones de `<Tabs.Screen>`: `title` (etiqueta; por defecto, el `name`) e
+Opciones de `<Tabs.Screen>`: `title` (etiqueta; por defecto, el `name`),
 `icon`, una render prop `({ focused, color, size }) => ReactNode` — el
 paquete no bundlea ningún set de iconos, pasa el tuyo (un `Image`, un SVG,
-`react-native-vector-icons`, un emoji en un `Text`...):
+`react-native-vector-icons`, un emoji en un `Text`...) — y
+`accessibilityLabel` (label para lectores de pantalla; por defecto cae a
+`title` y luego al nombre de ruta, igual que la etiqueta visible):
 
 ```tsx
 <Tabs showLabel={false}>
@@ -267,6 +269,106 @@ ruta; las no listadas van detrás en su orden natural) y `hidden`
 (pestañas fuera de la barra con rutas aún navegables; ideal para
 visibilidad dinámica calculada en el layout) — `order` y `hidden` tienen
 el mismo comportamiento que sus equivalentes de `NavigatorConfig`.
+
+| Prop | Descripción |
+| --- | --- |
+| `style` | Estilo del contenedor de la barra (p. ej. `backgroundColor: 'transparent'` o semitransparente para un tabbar flotante). |
+| `activeTintColor` | Color de la pestaña activa (etiqueta, icono e indicador). Por defecto `#0a7ea4`. |
+| `inactiveTintColor` | Color de las pestañas inactivas. Por defecto `#8e8e93`. |
+
+```tsx
+<Tabs
+  style={{ backgroundColor: 'rgba(20,20,20,0.85)' }}
+  activeTintColor="#fff"
+  inactiveTintColor="#9a9a9a"
+/>
+```
+
+### Ocultar la tabbar al hacer scroll
+
+`useHideTabBarOnScroll()` devuelve un `onScroll` que, conectado al
+`ScrollView`/`FlatList` de una pantalla dentro de las `<Tabs>`, oculta la
+barra con un scroll hacia abajo sostenido y la muestra de inmediato al
+scrollear hacia arriba o volver al principio. Sin un `<Tabs>` ancestro es
+un no-op seguro.
+
+```tsx
+import { useHideTabBarOnScroll } from '@authuser/react-native-routing';
+
+export default function Feed() {
+  const { onScroll } = useHideTabBarOnScroll();
+  return (
+    <FlatList
+      data={items}
+      onScroll={onScroll}
+      scrollEventThrottle={16}
+      renderItem={renderItem}
+    />
+  );
+}
+```
+
+### Accesibilidad
+
+El header nativo de `<Stack>` lo anuncia el propio sistema operativo
+(VoiceOver/TalkBack leen el título al hacer push/pop, es un componente
+nativo real). La barra de `<Tabs>` es UI propia del paquete (`View`/
+`Pressable`/`Text`), así que necesita marcarse explícitamente:
+
+- Cada botón de pestaña expone `accessibilityRole="tab"`,
+  `accessibilityState={{ selected }}` y un label — `accessibilityLabel`
+  de `<Tabs.Screen>`/`metadata.tab`, con el mismo fallback que la
+  etiqueta visible (`title` → nombre de ruta).
+- Cambiar de pestaña no dispara ninguna transición nativa (todas las
+  pestañas viven en el mismo árbol), así que un lector de pantalla no lo
+  nota solo: `<Tabs>` llama a `AccessibilityInfo.announceForAccessibility`
+  con el label de la pestaña activa en cada cambio (no en el montaje
+  inicial).
+- Las animaciones de `<Tabs>` (indicador, `animation="fade"`, ocultar/
+  mostrar la barra con scroll) respetan el ajuste del sistema
+  "reducir movimiento": con `AccessibilityInfo.isReduceMotionEnabled()`
+  activo, se aplican sin transición en lugar de animarse.
+
+```tsx
+// app/(tabs)/layout.tsx
+<Tabs>
+  <Tabs.Screen
+    name="home"
+    options={{ title: 'Inicio', accessibilityLabel: 'Ir a la pantalla de inicio' }}
+  />
+</Tabs>
+```
+
+El paquete no incluye i18n propio (cero dependencias runtime): conecta tu
+propia librería de traducción dentro de `generateMetadata` o del
+`accessibilityLabel`/`title` que pases — ese mismo string localizado es
+el que se pinta en pantalla, el que lee TalkBack/VoiceOver y el que se
+anuncia al cambiar de pestaña, así que queda traducido en los tres sitios
+a la vez.
+
+`useScreenReaderEnabled()` expone
+`AccessibilityInfo.isScreenReaderEnabled()` como hook reactivo (se
+suscribe a los cambios) para que la app adapte su propia UI — por
+ejemplo, desactivar el auto-hide del tabbar con scroll cuando hay un
+lector de pantalla activo, ya que ocultar controles interactivos a un
+usuario que no hace scroll con el dedo (usa gestos o un lector) puede
+dejarlo sin acceso a la barra:
+
+```tsx
+import { useScreenReaderEnabled, useHideTabBarOnScroll } from '@authuser/react-native-routing';
+
+function Feed() {
+  const screenReaderEnabled = useScreenReaderEnabled();
+  const { onScroll } = useHideTabBarOnScroll();
+  return (
+    <FlatList
+      data={items}
+      onScroll={screenReaderEnabled ? undefined : onScroll}
+      renderItem={renderItem}
+    />
+  );
+}
+```
 
 ### `<Slot>`
 

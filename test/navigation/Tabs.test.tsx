@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Pressable, Text } from 'react-native';
+import { AccessibilityInfo, Pressable, StyleSheet, Text } from 'react-native';
+import { withTiming } from 'react-native-reanimated';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { RootRouter } from '../../src/navigation/RootRouter';
 import { Stack } from '../../src/navigation/Stack';
 import { Tabs } from '../../src/navigation/Tabs';
+import { useHideTabBarOnScroll } from '../../src/navigation/tab-bar-visibility';
 import type { RequireContext } from '../../src/route-tree/context';
 
 function fakeContext(modules: Record<string, unknown>): RequireContext {
@@ -39,6 +41,10 @@ function makeContext(layout: unknown = TabsLayout) {
 }
 
 describe('Tabs', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('mounts every tab in its own Screen, active one in foreground', async () => {
     await render(<RootRouter context={makeContext()} initialPath="/home" />);
     const screens = screen.getAllByTestId('screen');
@@ -201,6 +207,155 @@ describe('Tabs', () => {
     expect(screen.getByTestId('icon-home')).toBeTruthy();
     expect(screen.queryByText('Inicio')).toBeNull();
     expect(screen.queryByText('Perfil')).toBeNull();
+  });
+
+  it('applies a custom background style to the tab bar', async () => {
+    const StyledLayout = () => (
+      <Tabs style={{ backgroundColor: 'transparent' }}>
+        <Tabs.Screen name="home" options={{ title: 'Inicio' }} />
+        <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
+      </Tabs>
+    );
+    await render(
+      <RootRouter context={makeContext(StyledLayout)} initialPath="/home" />,
+    );
+    const safeAreas = screen.getAllByTestId('safe-area');
+    const bar = safeAreas[safeAreas.length - 1]!;
+    expect(StyleSheet.flatten(bar.props.style).backgroundColor).toBe(
+      'transparent',
+    );
+  });
+
+  it('uses activeTintColor/inactiveTintColor for labels and the indicator', async () => {
+    const TintedLayout = () => (
+      <Tabs activeTintColor="#ff00ff" inactiveTintColor="#333333">
+        <Tabs.Screen name="home" options={{ title: 'Inicio' }} />
+        <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
+      </Tabs>
+    );
+    await render(
+      <RootRouter context={makeContext(TintedLayout)} initialPath="/home" />,
+    );
+    expect(StyleSheet.flatten(screen.getByText('Inicio').props.style).color).toBe(
+      '#ff00ff',
+    );
+    expect(
+      StyleSheet.flatten(screen.getByText('Perfil').props.style).color,
+    ).toBe('#333333');
+    expect(
+      StyleSheet.flatten(screen.getByTestId('tab-indicator').props.style)
+        .backgroundColor,
+    ).toBe('#ff00ff');
+  });
+
+  it('passes activeTintColor/inactiveTintColor to the icon render prop', async () => {
+    const IconLayout = () => (
+      <Tabs activeTintColor="#ff00ff" inactiveTintColor="#333333">
+        <Tabs.Screen
+          name="home"
+          options={{
+            icon: ({ color }) => <Text testID="icon-home">{color}</Text>,
+          }}
+        />
+        <Tabs.Screen name="profile" />
+      </Tabs>
+    );
+    await render(
+      <RootRouter context={makeContext(IconLayout)} initialPath="/home" />,
+    );
+    expect(screen.getByTestId('icon-home').props.children).toBe('#ff00ff');
+  });
+
+  it('exposes accessibilityRole, state and label on each tab button', async () => {
+    await render(<RootRouter context={makeContext()} initialPath="/home" />);
+    const home = screen.getByTestId('tab-home');
+    const profile = screen.getByTestId('tab-profile');
+    expect(home.props.accessibilityRole).toBe('tab');
+    expect(home.props.accessibilityState).toEqual({ selected: true });
+    expect(home.props.accessibilityLabel).toBe('Inicio');
+    expect(profile.props.accessibilityRole).toBe('tab');
+    expect(profile.props.accessibilityState).toEqual({ selected: false });
+    expect(profile.props.accessibilityLabel).toBe('Perfil');
+  });
+
+  it('falls back to the route name for accessibilityLabel without a title', async () => {
+    const PlainLayout = () => <Tabs />;
+    await render(
+      <RootRouter context={makeContext(PlainLayout)} initialPath="/home" />,
+    );
+    expect(screen.getByTestId('tab-home').props.accessibilityLabel).toBe(
+      'home',
+    );
+  });
+
+  it('uses an explicit accessibilityLabel over the title', async () => {
+    const Layout = () => (
+      <Tabs>
+        <Tabs.Screen
+          name="home"
+          options={{ title: 'Inicio', accessibilityLabel: 'Ir a inicio' }}
+        />
+        <Tabs.Screen name="profile" options={{ title: 'Perfil' }} />
+      </Tabs>
+    );
+    await render(
+      <RootRouter context={makeContext(Layout)} initialPath="/home" />,
+    );
+    expect(screen.getByTestId('tab-home').props.accessibilityLabel).toBe(
+      'Ir a inicio',
+    );
+  });
+
+  it('announces the new tab to screen readers on switch, not on mount', async () => {
+    await render(<RootRouter context={makeContext()} initialPath="/home" />);
+    expect(AccessibilityInfo.announceForAccessibility).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByTestId('tab-profile'));
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(
+      'Perfil',
+    );
+  });
+
+  it('skips animation duration when reduce motion is enabled', async () => {
+    (
+      AccessibilityInfo.isReduceMotionEnabled as jest.Mock
+    ).mockResolvedValueOnce(true);
+    await render(<RootRouter context={makeContext()} initialPath="/home" />);
+    await fireEvent.press(screen.getByTestId('tab-profile'));
+
+    const zeroDurationCalls = (
+      withTiming as unknown as jest.Mock
+    ).mock.calls.filter(
+      ([, config]: [unknown, { duration?: number } | undefined]) =>
+        config?.duration === 0,
+    );
+    expect(zeroDurationCalls.length).toBeGreaterThan(0);
+  });
+
+  it('provides scroll visibility context to descendant screens', async () => {
+    const ScrollHome = () => {
+      const { onScroll } = useHideTabBarOnScroll();
+      return (
+        <Pressable
+          testID="scroll"
+          onPress={() =>
+            onScroll({
+              nativeEvent: { contentOffset: { y: 100 } },
+            } as never)
+          }
+        >
+          <Text>Home</Text>
+        </Pressable>
+      );
+    };
+    const ctx = fakeContext({
+      './(tabs)/layout.tsx': TabsLayout,
+      './(tabs)/home.tsx': ScrollHome,
+      './(tabs)/profile.tsx': Profile,
+    });
+    await render(<RootRouter context={ctx} initialPath="/home" />);
+    expect(screen.getByTestId('tabs-bar')).toBeTruthy();
+    await fireEvent.press(screen.getByTestId('scroll'));
   });
 
   it('keeps tab state when nested inside a root Stack', async () => {

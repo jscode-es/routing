@@ -14,6 +14,9 @@ export interface TabsScreenOptions {
   // Render prop: el consumidor trae su propio icono (Image, SVG,
   // vector-icons, un emoji en un Text...), el paquete no bundlea ninguno.
   icon?: (props: TabIconProps) => ReactNode;
+  // Label para lectores de pantalla; por defecto cae a title y luego al
+  // nombre de ruta (mismo fallback que la etiqueta visible).
+  accessibilityLabel?: string;
 }
 
 export interface TabsScreenProps {
@@ -65,6 +68,8 @@ function tabOptions(
   return {
     title: explicit.title ?? meta.title,
     icon: explicit.icon ?? meta.tab?.icon,
+    accessibilityLabel:
+      explicit.accessibilityLabel ?? meta.tab?.accessibilityLabel,
   };
 }
 

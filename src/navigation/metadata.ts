@@ -10,6 +10,7 @@ export interface ScreenMetadata extends StackScreenOptions {
   // dentro de un Tabs y de un Stack anidado.
   tab?: {
     icon?: (props: TabIconProps) => ReactNode;
+    accessibilityLabel?: string;
   };
 }
 
